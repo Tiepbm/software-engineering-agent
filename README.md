@@ -12,6 +12,37 @@ This is a principal-level engineering agent for enterprise and regulated systems
   - `instructions/principal-agent-maintenance.instructions.md`
   - `instructions/principal-skills-maintenance.instructions.md`
 
+## Recommended GitHub Topics
+
+Use these repository topics on GitHub for discoverability:
+
+- `copilot-agent`
+- `github-copilot`
+- `prompt-engineering`
+- `software-engineering`
+- `enterprise-architecture`
+- `system-design`
+- `api-design`
+- `data-engineering`
+- `database-architecture`
+- `security-review`
+- `observability`
+- `sre`
+- `devops`
+- `performance-engineering`
+- `refactoring`
+- `regulated-systems`
+- `banking`
+- `insurance`
+
+Quick set from GitHub UI: Repository -> Settings -> General -> Topics.
+
+Optional via GitHub CLI:
+
+```bash
+gh repo edit <owner>/<repo> --add-topic copilot-agent --add-topic github-copilot --add-topic prompt-engineering --add-topic software-engineering --add-topic enterprise-architecture --add-topic system-design --add-topic api-design --add-topic data-engineering --add-topic database-architecture --add-topic security-review --add-topic observability --add-topic sre --add-topic devops --add-topic performance-engineering --add-topic refactoring --add-topic regulated-systems --add-topic banking --add-topic insurance
+```
+
 ## Package Structure
 
 ```text
@@ -36,6 +67,43 @@ ce7-software-engineering/
 ## Response Model
 
 For non-trivial requests, the agent runs mandatory 6-step triage: primary role, supporting lenses, task type, risk class, regulatory sensitivity, and missing constraints.
+
+## Installation and Setup
+
+This package is documentation-first and file-based. Based on the current repository structure (`agents/`, `skills/`, `instructions/`), use the steps below to install and start using it in your workspace.
+
+### 1) Clone the repository
+
+```bash
+git clone <your-repo-url>
+cd ce7-software-engineering
+```
+
+### 2) Keep the package structure intact
+
+Required paths:
+
+- `agents/ce7-software-engineering.agent.md`
+- `skills/<skill-name>/SKILL.md` (33 skills)
+- `instructions/principal-agent-maintenance.instructions.md`
+- `instructions/principal-skills-maintenance.instructions.md`
+
+### 3) Open in your IDE workspace
+
+Open this folder as part of your workspace so Copilot can read agent + skill markdown files.
+
+### 4) Start with a routing-first prompt
+
+Ask the assistant with a clear task and constraints, for example:
+
+- "Act as CE7 Software Engineering Agent. Design idempotent payment retries for a multi-tenant mobile flow."
+- "Review this change using security, data, and release-risk lenses."
+
+### 5) Verify package health after updates
+
+- Ensure both `README.md` and `README.vi-VN.md` stay aligned.
+- Ensure all skill links still resolve to `skills/<skill>/SKILL.md`.
+- Update `REVIEW.md` after major changes.
 
 ## Full 33-Skill Mapping
 

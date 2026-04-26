@@ -12,6 +12,37 @@
   - `instructions/principal-agent-maintenance.instructions.md`
   - `instructions/principal-skills-maintenance.instructions.md`
 
+## Chủ đề GitHub đề xuất (Tags/Topics)
+
+Đề xuất gắn các topic sau cho repository trên GitHub để tăng khả năng tìm kiếm:
+
+- `copilot-agent`
+- `github-copilot`
+- `prompt-engineering`
+- `software-engineering`
+- `enterprise-architecture`
+- `system-design`
+- `api-design`
+- `data-engineering`
+- `database-architecture`
+- `security-review`
+- `observability`
+- `sre`
+- `devops`
+- `performance-engineering`
+- `refactoring`
+- `regulated-systems`
+- `banking`
+- `insurance`
+
+Thiết lập nhanh trên GitHub UI: Repository -> Settings -> General -> Topics.
+
+Tùy chọn với GitHub CLI:
+
+```bash
+gh repo edit <owner>/<repo> --add-topic copilot-agent --add-topic github-copilot --add-topic prompt-engineering --add-topic software-engineering --add-topic enterprise-architecture --add-topic system-design --add-topic api-design --add-topic data-engineering --add-topic database-architecture --add-topic security-review --add-topic observability --add-topic sre --add-topic devops --add-topic performance-engineering --add-topic refactoring --add-topic regulated-systems --add-topic banking --add-topic insurance
+```
+
 ## Cấu trúc package
 
 ```text
@@ -36,6 +67,43 @@ ce7-software-engineering/
 ## Cơ chế trả lời
 
 Với yêu cầu không tầm thường, agent thực hiện triage 6 bước bắt buộc: primary role, supporting lenses, task type, risk class, regulatory sensitivity và missing constraints.
+
+## Cài đặt và thiết lập
+
+Gói này theo hướng tài liệu + file markdown. Dựa trên cấu trúc hiện tại (`agents/`, `skills/`, `instructions/`), bạn có thể cài đặt nhanh như sau.
+
+### 1) Clone repository
+
+```bash
+git clone <your-repo-url>
+cd ce7-software-engineering
+```
+
+### 2) Giữ nguyên cấu trúc package
+
+Các đường dẫn bắt buộc:
+
+- `agents/ce7-software-engineering.agent.md`
+- `skills/<skill-name>/SKILL.md` (33 skills)
+- `instructions/principal-agent-maintenance.instructions.md`
+- `instructions/principal-skills-maintenance.instructions.md`
+
+### 3) Mở thư mục trong workspace IDE
+
+Mở thư mục này trong workspace để Copilot có thể đọc đầy đủ agent + skills + instructions.
+
+### 4) Bắt đầu bằng prompt có bối cảnh
+
+Ví dụ:
+
+- "Act as CE7 Software Engineering Agent. Design idempotent payment retries for a multi-tenant mobile flow."
+- "Review this change using security, data, and release-risk lenses."
+
+### 5) Kiểm tra sau khi cập nhật
+
+- Đảm bảo `README.md` và `README.vi-VN.md` còn đồng bộ.
+- Đảm bảo link trong bảng skills vẫn trỏ đúng `skills/<skill>/SKILL.md`.
+- Cập nhật `REVIEW.md` sau các thay đổi lớn.
 
 ## Bảng mapping đầy đủ 33 skills
 
