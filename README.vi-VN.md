@@ -13,37 +13,6 @@
   - `instructions/principal-agent-maintenance.instructions.md`
   - `instructions/principal-skills-maintenance.instructions.md`
 
-## Chủ đề GitHub đề xuất (Tags/Topics)
-
-Đề xuất gắn các topic sau cho repository trên GitHub để tăng khả năng tìm kiếm:
-
-- `copilot-agent`
-- `github-copilot`
-- `prompt-engineering`
-- `software-engineering`
-- `enterprise-architecture`
-- `system-design`
-- `api-design`
-- `data-engineering`
-- `database-architecture`
-- `security-review`
-- `observability`
-- `sre`
-- `devops`
-- `performance-engineering`
-- `refactoring`
-- `regulated-systems`
-- `banking`
-- `insurance`
-
-Thiết lập nhanh trên GitHub UI: Repository -> Settings -> General -> Topics.
-
-Tùy chọn với GitHub CLI:
-
-```bash
-gh repo edit <owner>/<repo> --add-topic copilot-agent --add-topic github-copilot --add-topic prompt-engineering --add-topic software-engineering --add-topic enterprise-architecture --add-topic system-design --add-topic api-design --add-topic data-engineering --add-topic database-architecture --add-topic security-review --add-topic observability --add-topic sre --add-topic devops --add-topic performance-engineering --add-topic refactoring --add-topic regulated-systems --add-topic banking --add-topic insurance
-```
-
 ## Cấu trúc package
 
 ```text

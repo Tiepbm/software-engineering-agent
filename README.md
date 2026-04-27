@@ -13,37 +13,6 @@ This is a principal-level engineering agent for enterprise and regulated systems
   - `instructions/principal-agent-maintenance.instructions.md`
   - `instructions/principal-skills-maintenance.instructions.md`
 
-## Recommended GitHub Topics
-
-Use these repository topics on GitHub for discoverability:
-
-- `copilot-agent`
-- `github-copilot`
-- `prompt-engineering`
-- `software-engineering`
-- `enterprise-architecture`
-- `system-design`
-- `api-design`
-- `data-engineering`
-- `database-architecture`
-- `security-review`
-- `observability`
-- `sre`
-- `devops`
-- `performance-engineering`
-- `refactoring`
-- `regulated-systems`
-- `banking`
-- `insurance`
-
-Quick set from GitHub UI: Repository -> Settings -> General -> Topics.
-
-Optional via GitHub CLI:
-
-```bash
-gh repo edit <owner>/<repo> --add-topic copilot-agent --add-topic github-copilot --add-topic prompt-engineering --add-topic software-engineering --add-topic enterprise-architecture --add-topic system-design --add-topic api-design --add-topic data-engineering --add-topic database-architecture --add-topic security-review --add-topic observability --add-topic sre --add-topic devops --add-topic performance-engineering --add-topic refactoring --add-topic regulated-systems --add-topic banking --add-topic insurance
-```
-
 ## Package Structure
 
 ```text
