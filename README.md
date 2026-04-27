@@ -138,6 +138,28 @@ For non-trivial requests, the agent runs mandatory 6-step triage: primary role, 
 
 This package is documentation-first and file-based. Based on the current repository structure (`.github/`, `agents/`, `skills/`, `instructions/`), use the steps below to install and start using it in your workspace.
 
+> **New here?** Start with `docs/GETTING-STARTED.md` for a 5-minute overview.
+
+### Documentation Map
+
+| Audience | Document | Purpose |
+|---|---|---|
+| **New users** | `docs/GETTING-STARTED.md` | 5-minute setup and first prompt |
+| **All users** | `README.md` | Full project overview, structure, and commands |
+| **All users** | `REVIEW.md` | Quality scores and improvement history |
+| **Evaluators** | `evals/file-based-benchmark-pipeline.md` | Quickstart commands for benchmarking |
+| **Evaluators** | `docs/pipeline-guide.md` | Full pipeline execution guide |
+| **Evaluators** | `docs/evaluation-improvement-playbook.md` | When and how to improve skills |
+| **Evaluators** | `evals/model-comparison-runbook.md` | GPT vs Claude comparison |
+| **Evaluators** | `evals/scoring-rubric.md` | Scoring criteria |
+| **Maintainers** | `instructions/principal-agent-maintenance.instructions.md` | Agent editing rules |
+| **Maintainers** | `instructions/principal-skills-maintenance.instructions.md` | Skill editing rules |
+| **Maintainers** | `docs/external-skill-research.md` | Patterns from sibling projects |
+| **Maintainers** | `docs/skill-pack-quality-rubric.md` | Quality gates for pack changes |
+| **Reports** | `reports/README.md` | Reports schema and ownership |
+
+All documents are available in English and Vietnamese (`.vi-VN.md` suffix).
+
 ### 1) Clone the repository
 
 ```bash

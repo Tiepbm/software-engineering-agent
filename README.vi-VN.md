@@ -138,6 +138,28 @@ Với yêu cầu không tầm thường, agent thực hiện triage 6 bước b�
 
 Gói này theo hướng tài liệu + file markdown. Dựa trên cấu trúc hiện tại (`.github/`, `agents/`, `skills/`, `instructions/`), bạn có thể cài đặt nhanh như sau.
 
+> **Mới đến?** Bắt đầu với `docs/GETTING-STARTED.vi-VN.md` để có cái nhìn tổng quan trong 5 phút.
+
+### Bản đồ tài liệu
+
+| Đối tượng | Tài liệu | Mục đích |
+|---|---|---|
+| **Người mới** | `docs/GETTING-STARTED.vi-VN.md` | Thiết lập 5 phút và prompt đầu tiên |
+| **Tất cả** | `README.vi-VN.md` | Tổng quan project, cấu trúc, lệnh |
+| **Tất cả** | `REVIEW.md` | Điểm chất lượng và lịch sử cải tiến |
+| **Đánh giá** | `evals/file-based-benchmark-pipeline.vi-VN.md` | Quickstart lệnh benchmark |
+| **Đánh giá** | `docs/pipeline-guide.vi-VN.md` | Guide pipeline đầy đủ |
+| **Đánh giá** | `docs/evaluation-improvement-playbook.vi-VN.md` | Khi nào và cách cải tiến skills |
+| **Đánh giá** | `evals/model-comparison-runbook.vi-VN.md` | So sánh GPT vs Claude |
+| **Đánh giá** | `evals/scoring-rubric.vi-VN.md` | Tiêu chí chấm điểm |
+| **Bảo trì** | `instructions/principal-agent-maintenance.instructions.md` | Quy tắc sửa agent |
+| **Bảo trì** | `instructions/principal-skills-maintenance.instructions.md` | Quy tắc sửa skills |
+| **Bảo trì** | `docs/external-skill-research.md` | Patterns từ project khác |
+| **Bảo trì** | `docs/skill-pack-quality-rubric.md` | Quality gates cho pack |
+| **Reports** | `reports/README.vi-VN.md` | Schema và ownership reports |
+
+Tất cả tài liệu có bản tiếng Anh và tiếng Việt (hậu tố `.vi-VN.md`).
+
 ### 1) Clone repository
 
 ```bash

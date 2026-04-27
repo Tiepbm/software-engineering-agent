@@ -1,8 +1,8 @@
 # Quality Review — Principal Software Engineering Copilot Package
 
-**Review date**: 2026-04-26  
+**Review date**: 2026-04-27  
 **Scope**: Copilot-first hybrid package with 2 agents + 7 pack skills + 33 references + eval harness.  
-**Status**: Post hybrid-pack migration.
+**Status**: Post hybrid-pack migration + P1/P2/P3 content improvements.
 
 > Migration note: the previous 33 peer skills are no longer peers. They are preserved as `references/*.md` under 7 pack skills and mirrored into `.github/skills/` for GitHub Copilot. Use `python3 scripts/validate_hybrid_packs.py` as the current structural quality gate.
 
@@ -254,7 +254,22 @@ No dangerous overlap remains.
 
 ## 8. Remaining Backlog
 
-No P0/P1/P2/P3 items remain from the original review.
+No P0/P1/P2/P3 items remain from the original review. P1/P2/P3 content improvements completed 2026-04-27.
+
+### Completed P1/P2/P3 improvements (2026-04-27)
+
+| Priority | Improvement | Target | Status |
+|---|---|---|---|
+| P1 | Test type decision matrix | `testing-strategy` (99→123 lines) | ✅ Done |
+| P1 | Resilience pattern decision matrix + timeout budget | `resilience-and-fault-tolerance` (101→136 lines) | ✅ Done |
+| P1 | Cache pattern decision matrix + Redis guidance | `caching-and-distributed-state` (103→125 lines) | ✅ Done |
+| P1 | SLI/SLO definition template + burn-rate calculation | `monitoring-alerting-and-slos` (101→155 lines) | ✅ Done |
+| P2 | Transactional outbox worked example | `messaging-and-eventing` (104→191 lines) | ✅ Done |
+| P2 | Canary rollout with SLO gates worked example | `devops-and-release` (175→317 lines) | ✅ Done |
+| P2 | Production readiness checklist template | `observability-and-sre` (94→169 lines) | ✅ Done |
+| P2 | Structured log field schema + metric naming | `logging-metrics-and-tracing` (101→154 lines) | ✅ Done |
+| P3 | Cross-surface security review worked example | `security-review` (112→171 lines) | ✅ Done |
+| P3 | Database workload-fit decision worked example | `database-architecture` (131→218 lines) | ✅ Done |
 
 ### Optional P4 improvements
 
