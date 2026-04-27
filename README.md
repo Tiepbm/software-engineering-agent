@@ -167,17 +167,68 @@ git clone <your-repo-url>
 cd software-engineering-agent
 ```
 
-### 2) Keep the package structure intact
+### 2) Choose installation mode
 
-Required paths:
+#### Option A: Global installation (all workspaces)
 
-- `.github/copilot-instructions.md`
-- `.github/skills/<pack-name>/SKILL.md` (7 pack skills)
-- `.github/skills/<pack-name>/references/<leaf>.md` (33 former leaf skills)
-- `agents/ce7-software-engineering.agent.md`
-- `agents/skill-evaluator.agent.md`
-- `instructions/principal-agent-maintenance.instructions.md`
-- `instructions/principal-skills-maintenance.instructions.md`
+Copy to `~/.copilot` so the agent is available in every project:
+
+```bash
+# Agent + instructions
+cp agents/ce7-software-engineering.agent.md ~/.copilot/agents/
+cp instructions/*.instructions.md ~/.copilot/instructions/
+cp .github/copilot-instructions.md ~/.copilot/copilot-instructions.md
+
+# Skills (7 packs + 33 references)
+rm -rf ~/.copilot/skills/*
+cp -R .github/skills/* ~/.copilot/skills/
+```
+
+Structure after install:
+
+```text
+~/.copilot/
+  copilot-instructions.md
+  agents/
+    ce7-software-engineering.agent.md
+  instructions/
+    principal-agent-maintenance.instructions.md
+    principal-skills-maintenance.instructions.md
+  skills/
+    core-engineering-pack/SKILL.md
+    core-engineering-pack/references/*.md
+    data-database-analytics-pack/SKILL.md
+    data-database-analytics-pack/references/*.md
+    security-access-pack/SKILL.md
+    security-access-pack/references/*.md
+    platform-integration-pack/SKILL.md
+    platform-integration-pack/references/*.md
+    resilience-performance-pack/SKILL.md
+    resilience-performance-pack/references/*.md
+    observability-release-pack/SKILL.md
+    observability-release-pack/references/*.md
+    storage-search-stack-pack/SKILL.md
+    storage-search-stack-pack/references/*.md
+```
+
+#### Option B: Workspace-only installation
+
+Keep the repo as a workspace folder. Copilot reads from `.github/` automatically:
+
+```bash
+# Just open the folder in your IDE — no copy needed
+# Copilot discovers .github/copilot-instructions.md and .github/skills/ automatically
+```
+
+#### Option C: Add to existing project
+
+Copy `.github/` contents into your project:
+
+```bash
+cp .github/copilot-instructions.md <your-project>/.github/
+cp -R .github/skills/ <your-project>/.github/skills/
+cp -R .github/agents/ <your-project>/.github/agents/
+```
 
 ### 3) Open in your IDE workspace
 

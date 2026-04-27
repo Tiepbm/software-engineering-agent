@@ -10,11 +10,11 @@
 
 ## Current snapshot
 
-- **Run ID:** `smoke-reports-2`
-- **Generated:** 2026-04-27T13:17:57.938237+00:00
+- **Run ID:** `2026-04-27-baseline-v1`
+- **Generated:** 2026-04-27T15:07:18.188614+00:00
 - **Benchmark:** `evals/banking-insurance-benchmark.jsonl`
 - **Models:** `gpt`
-- **Outputs scored:** 2
+- **Outputs scored:** 10
 - **Semantic status:** `pending_skill_evaluator`
 
 ## Deterministic scorecard
@@ -22,7 +22,7 @@
 | Metric | Value |
 |---|---:|
 | Average deterministic score | 100.0 |
-| PASS | 2 |
+| PASS | 10 |
 | WARN | 0 |
 | FAIL | 0 |
 
@@ -30,7 +30,7 @@
 
 | Model | Outputs | Avg score | PASS | WARN | FAIL | Avg words |
 |---|---:|---:|---:|---:|---:|---:|
-| gpt | 2 | 100.0 | 2 | 0 | 0 | 136.5 |
+| gpt | 10 | 100.0 | 10 | 0 | 0 | 999.7 |
 
 ## Highest-signal findings
 
@@ -50,15 +50,18 @@
 
 | Model | Prompt | Score | Verdict | Main issue |
 |---|---|---:|---|---|
-| gpt | banking-001-payment-idempotency | 100 | PASS | no major deterministic issue |
-| gpt | banking-002-loan-origination-underwriting | 100 | PASS | no major deterministic issue |
+| gpt | insurance-002-policy-endorsement-midterm-adjustment | 100 | PASS | no major deterministic issue |
+| gpt | insurance-001-claim-fnol-to-settlement | 100 | PASS | no major deterministic issue |
+| gpt | insurance-004-reinsurance-bordereaux-analytics | 100 | PASS | no major deterministic issue |
+| gpt | cross-001-bancassurance-quote-bind | 100 | PASS | no major deterministic issue |
+| gpt | insurance-003-catastrophe-claims-surge | 100 | PASS | no major deterministic issue |
 
 ## Artifacts
 
-- `runs/<run_id>/report.json`: `runs/smoke-reports-2/report.json`
-- `runs/<run_id>/summary.md`: `runs/smoke-reports-2/summary.md`
-- `runs/<run_id>/scores.jsonl`: `runs/smoke-reports-2/scores.jsonl`
-- `runs/<run_id>/evaluator-prompts/`: `runs/smoke-reports-2/evaluator-prompts`
+- `runs/<run_id>/report.json`: `runs/2026-04-27-baseline-v1/report.json`
+- `runs/<run_id>/summary.md`: `runs/2026-04-27-baseline-v1/summary.md`
+- `runs/<run_id>/scores.jsonl`: `runs/2026-04-27-baseline-v1/scores.jsonl`
+- `runs/<run_id>/evaluator-prompts/`: `runs/2026-04-27-baseline-v1/evaluator-prompts`
 - Global history: `reports/skill-eval-history.jsonl`
 
 ## Rules for this report

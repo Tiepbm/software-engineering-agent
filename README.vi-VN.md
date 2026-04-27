@@ -167,17 +167,68 @@ git clone <your-repo-url>
 cd software-engineering-agent
 ```
 
-### 2) Giữ nguyên cấu trúc package
+### 2) Chọn chế độ cài đặt
 
-Các đường dẫn bắt buộc:
+#### Option A: Cài đặt Global (tất cả workspace)
 
-- `.github/copilot-instructions.md`
-- `.github/skills/<pack-name>/SKILL.md` (7 pack skills)
-- `.github/skills/<pack-name>/references/<leaf>.md` (33 leaf references)
-- `agents/ce7-software-engineering.agent.md`
-- `agents/skill-evaluator.agent.md`
-- `instructions/principal-agent-maintenance.instructions.md`
-- `instructions/principal-skills-maintenance.instructions.md`
+Copy vào `~/.copilot` để agent hoạt động ở mọi project:
+
+```bash
+# Agent + instructions
+cp agents/ce7-software-engineering.agent.md ~/.copilot/agents/
+cp instructions/*.instructions.md ~/.copilot/instructions/
+cp .github/copilot-instructions.md ~/.copilot/copilot-instructions.md
+
+# Skills (7 packs + 33 references)
+rm -rf ~/.copilot/skills/*
+cp -R .github/skills/* ~/.copilot/skills/
+```
+
+Cấu trúc sau khi cài:
+
+```text
+~/.copilot/
+  copilot-instructions.md
+  agents/
+    ce7-software-engineering.agent.md
+  instructions/
+    principal-agent-maintenance.instructions.md
+    principal-skills-maintenance.instructions.md
+  skills/
+    core-engineering-pack/SKILL.md
+    core-engineering-pack/references/*.md
+    data-database-analytics-pack/SKILL.md
+    data-database-analytics-pack/references/*.md
+    security-access-pack/SKILL.md
+    security-access-pack/references/*.md
+    platform-integration-pack/SKILL.md
+    platform-integration-pack/references/*.md
+    resilience-performance-pack/SKILL.md
+    resilience-performance-pack/references/*.md
+    observability-release-pack/SKILL.md
+    observability-release-pack/references/*.md
+    storage-search-stack-pack/SKILL.md
+    storage-search-stack-pack/references/*.md
+```
+
+#### Option B: Chỉ cài trong workspace
+
+Giữ repo như một workspace folder. Copilot tự đọc từ `.github/`:
+
+```bash
+# Chỉ cần mở folder trong IDE — không cần copy
+# Copilot tự phát hiện .github/copilot-instructions.md và .github/skills/
+```
+
+#### Option C: Thêm vào project hiện có
+
+Copy nội dung `.github/` vào project của bạn:
+
+```bash
+cp .github/copilot-instructions.md <your-project>/.github/
+cp -R .github/skills/ <your-project>/.github/skills/
+cp -R .github/agents/ <your-project>/.github/agents/
+```
 
 ### 3) Mở thư mục trong workspace IDE
 

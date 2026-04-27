@@ -144,12 +144,14 @@ def build_manual_worklist(target: Path, models: list[str], rows: list[dict[str, 
         "",
         "Use this checklist while running prompts in Copilot/Chat windows and pasting outputs into files.",
         "",
-        "| Model | Prompt ID | Prompt file | Output file |",
+        "Prompts are shared across models — same input, different output files per model.",
+        "",
+        "| Model | Prompt ID | Prompt file (shared) | Output file |",
         "|---|---|---|---|",
     ]
     for model in models:
         for row in rows:
-            prompt_path = target / "prompts" / model / f"{row['id']}.md"
+            prompt_path = target / "prompts" / f"{row['id']}.md"
             output_path = target / "outputs" / model / f"{row['id']}.md"
             lines.append(
                 f"| `{model}` | `{row['id']}` | `{rel(prompt_path)}` | `{rel(output_path)}` |"
@@ -175,8 +177,8 @@ def build_manual_readme(target: Path, models: list[str]) -> str:
             "",
             "## Steps",
             "",
-            "1. Open prompts under `prompts/<model>/` in your IDE.",
-            "2. For each prompt, run it in the corresponding chat model window.",
+            "1. Open shared prompts under `prompts/<prompt_id>.md` in your IDE.",
+            "2. For each prompt, run it in each model's chat window.",
             "3. Paste the model answer into `outputs/<model>/<prompt_id>.md`.",
             "4. Remove the pending marker line `<!-- CE7_OUTPUT_PENDING -->` from each completed output file.",
             "5. Run finalize to score and generate evaluator prompts.",
@@ -540,24 +542,37 @@ def prepare(args: argparse.Namespace) -> int:
     benchmark = load_jsonl(Path(args.benchmark))
     models = parse_models_csv(args.models) if args.models else DEFAULT_MODELS
     target = run_dir(args.run_id, Path(args.runs_dir))
-    (target / "prompts").mkdir(parents=True, exist_ok=True)
+    prompts_dir = target / "prompts"
+    prompts_dir.mkdir(parents=True, exist_ok=True)
     (target / "outputs").mkdir(parents=True, exist_ok=True)
     for model in models:
-        (target / "prompts" / model).mkdir(parents=True, exist_ok=True)
         (target / "outputs" / model).mkdir(parents=True, exist_ok=True)
-        for row in benchmark:
-            prompt_path = target / "prompts" / model / f"{row['id']}.md"
-            prompt_path.write_text(prompt_wrapper(row), encoding="utf-8")
+    # Shared prompts — same prompt for all models
+    for row in benchmark:
+        prompt_path = prompts_dir / f"{row['id']}.md"
+        prompt_path.write_text(prompt_wrapper(row), encoding="utf-8")
+    # Backward compat: also create per-model symlink dirs if needed by older workflows
+    for model in models:
+        model_prompt_dir = prompts_dir / model
+        if not model_prompt_dir.exists():
+            model_prompt_dir.mkdir(parents=True, exist_ok=True)
+            for row in benchmark:
+                src = prompts_dir / f"{row['id']}.md"
+                dst = model_prompt_dir / f"{row['id']}.md"
+                if not dst.exists():
+                    dst.write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
     manifest = {
         "run_id": args.run_id,
         "benchmark": str(Path(args.benchmark).relative_to(ROOT) if Path(args.benchmark).is_absolute() else args.benchmark),
         "models": models,
         "prompt_count": len(benchmark),
         "created_at": datetime.now(timezone.utc).isoformat(),
+        "prompt_layout": "shared",
         "output_contract": "Save model outputs to runs/<run_id>/outputs/<model>/<prompt_id>.md",
     }
     (target / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"Prepared {len(benchmark)} prompts for {len(models)} model(s) in {target.relative_to(ROOT)}")
+    print(f"Prepared {len(benchmark)} shared prompts for {len(models)} model(s) in {target.relative_to(ROOT)}")
+    print(f"Prompts: {target.relative_to(ROOT)}/prompts/<prompt_id>.md")
     print(f"Save outputs under: {target.relative_to(ROOT)}/outputs/<model>/<prompt_id>.md")
     return 0
 
@@ -577,7 +592,7 @@ def implement(args: argparse.Namespace) -> int:
     created_stubs = 0
     for model in models:
         for row in benchmark:
-            prompt_path = target / "prompts" / model / f"{row['id']}.md"
+            prompt_path = target / "prompts" / f"{row['id']}.md"
             output_path = target / "outputs" / model / f"{row['id']}.md"
             if output_path.exists() and not args.overwrite_stubs:
                 continue
@@ -591,7 +606,7 @@ def implement(args: argparse.Namespace) -> int:
 
     print(f"Prepared manual run in {rel(target)}")
     print(f"- models: {', '.join(models)}")
-    print(f"- prompts: {len(benchmark) * len(models)}")
+    print(f"- shared prompts: {len(benchmark)}")
     print(f"- output stubs written: {created_stubs}")
     print(f"- manual guide: {rel(manual_dir / 'README.md')}")
     print(f"- worklist: {rel(manual_dir / 'worklist.md')}")
@@ -1142,7 +1157,11 @@ def run_end_to_end(args: argparse.Namespace) -> int:
     prepare(prepare_args)
 
     target = run_dir(args.run_id, Path(args.runs_dir))
-    model_prompt_dir = target / "prompts" / model_label
+    # Shared prompts directory (same prompts for all models)
+    model_prompt_dir = target / "prompts"
+    # Fall back to per-model dir for backward compat with older runs
+    if not any(model_prompt_dir.glob("*.md")):
+        model_prompt_dir = target / "prompts" / model_label
     model_output_dir = target / "outputs" / model_label
     model_output_dir.mkdir(parents=True, exist_ok=True)
 
