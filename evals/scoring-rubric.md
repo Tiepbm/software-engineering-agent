@@ -49,3 +49,15 @@ Record these alongside the score:
 
 If a prompt previously scored ≥80 and now scores <80, treat it as a regression even if the average package score remains acceptable.
 
+## Banking / Non-Life Insurance Benchmark Notes
+
+For `evals/banking-insurance-benchmark.jsonl`, raise expectations for regulated workflows:
+
+- Banking prompts involving money movement must address idempotency, duplicate prevention, reconciliation, audit evidence, and operator repair.
+- Core banking or ledger migration prompts must include expand-contract migration, reconciliation queries, restore/rollback or roll-forward, and regulator-safe reporting.
+- Non-life insurance claim prompts must include state transitions, document retention, role-based access, fraud/assessment paths, payment integration, and appeal/failure paths.
+- Bancassurance prompts must define bank/insurer integration boundaries, consent, data sharing, payment/policy issuance consistency, refund/cancellation state, and partner outage behavior.
+- Customer 360/search prompts must not treat search indexes as source of truth and must include field/document-level authorization, masking, audit, deletion/correction, and index lag monitoring.
+
+Penalize outputs that are technically plausible but ignore regulated-domain correctness, auditability, support operations, or downstream reporting.
+

@@ -1,5 +1,13 @@
 # Playbook đánh giá và cải tiến CE7 Agent / Skill Packs
 
+[English](evaluation-improvement-playbook.md) | [Tiếng Việt](evaluation-improvement-playbook.vi-VN.md)
+
+> **Bạn đang ở đâu?** Đây là tài liệu chuẩn cho **chính sách đánh giá** và **quy tắc cải tiến**.
+>
+> - Nếu bạn cần cách chạy lệnh pipeline: xem `docs/pipeline-guide.vi-VN.md`.
+> - Nếu bạn cần quickstart ngắn: xem `evals/file-based-benchmark-pipeline.vi-VN.md`.
+> - Nếu bạn cần so sánh GPT vs Claude trên banking/insurance benchmark: xem `evals/model-comparison-runbook.vi-VN.md`.
+
 **Mục tiêu:** giúp bạn đánh giá chất lượng agent + skills một cách lặp lại được, biết nên cải tiến chỗ nào, và tránh làm hệ thống phình token.
 
 ## 1. Nguyên tắc vận hành
@@ -24,253 +32,129 @@ CE7 hiện dùng kiến trúc **Copilot-first hybrid packs**:
 
 ### Layer 1 — Structural validation
 
-Chạy deterministic checks trước mọi review:
+Chạy `python3 scripts/validate_hybrid_packs.py` trước mọi review.
 
-```bash
-python3 scripts/validate_hybrid_packs.py
-```
-
-Validator kiểm tra:
-
-- đúng 7 peer pack skills;
-- đúng 33 references;
-- chỉ có 2 agents hiện tại;
-- chưa thêm deferred agents;
-- `.github/skills` và root `skills` đúng cấu trúc;
-- benchmark corpus tồn tại;
-- external research/rubric tồn tại;
-- pack descriptions dùng `Use when`;
-- pack không vượt line budget.
-
-**Fail ở layer này thì chưa review semantic.** Sửa cấu trúc trước.
+Fail ở layer này thì **chưa review semantic**. Sửa cấu trúc trước.
 
 ### Layer 2 — Routing benchmark
 
-Dùng `evals/routing-benchmark.jsonl` để kiểm tra:
-
-- prompt nên activate pack nào;
-- reference nào cần mở;
-- pack/reference nào không nên activate;
-- prompt cross-domain có route hợp lý không.
-
-Mỗi benchmark row nên có:
-
-```json
-{
-  "id": "security-001",
-  "prompt": "Review an admin endpoint that changes customer email and logs PII.",
-  "expected_packs": ["security-access-pack", "observability-release-pack"],
-  "expected_references": ["security-review", "authn-authz-and-secrets", "logging-metrics-and-tracing"],
-  "should_not_activate": ["data-database-analytics-pack"]
-}
-```
-
-Mục tiêu:
-
-- giảm false positive: pack bị mở sai;
-- giảm false negative: pack cần mà không mở;
-- giảm reference bloat: mở quá nhiều references.
+Dùng benchmark để xem prompt có activate đúng pack/reference và tránh false activation không.
 
 ### Layer 3 — Semantic answer quality
 
-Cho `skill-evaluator` chấm output trên cùng benchmark prompt.
-
-Score 0–5 cho các chiều:
-
-| Dimension | Câu hỏi đánh giá |
-|---|---|
-| Correctness | Câu trả lời có đúng vấn đề và domain không? |
-| Principal judgment | Có nêu trade-off, rejected options, rủi ro không? |
-| Evidence discipline | Có yêu cầu baseline, logs, metrics, tests, threat model, execution plan không? |
-| Production readiness | Có migration, rollback, observability, owner, runbook không? |
-| Security/data safety | Có authz, tenant isolation, audit, sensitive logging, PII không? |
-| Testability | Acceptance criteria/test cases có kiểm chứng được không? |
-| Actionability | Team có thể làm theo ngay không? |
-| Brevity | Có đủ nhưng không dài lan man không? |
+Cho `skill-evaluator` chấm output theo correctness, principal judgment, evidence discipline, production readiness, security/data safety, testability, actionability và brevity.
 
 ### Layer 4 — Token efficiency
 
-Đánh giá token theo hành vi, không chỉ line count.
+Đánh giá theo hành vi:
 
-| Metric | Good | Bad |
-|---|---|---|
-| Pack activation count | 1 pack mặc định, 2–3 nếu cross-domain | 4+ packs cho prompt bình thường |
-| Reference count | 0–2 references thường, 3 khi phức tạp | mở toàn bộ references |
-| Pack body size | dưới 220 lines | pack biến thành tutorial |
-| Answer style | synthesized rules + exact references | paste nguyên đoạn reference |
-| Repetition | route ngắn, không lặp platform rules | cùng một paragraph xuất hiện nhiều pack |
+- số pack mở;
+- số reference mở;
+- answer có paste reference không;
+- có lặp rules giữa nhiều packs không.
 
 ### Layer 5 — Regression history
 
-Sau mỗi lần benchmark, ghi lại vào:
+Ghi vào:
 
 ```text
 reports/latest-skill-eval.md
+reports/latest-skill-eval.vi-VN.md
 reports/skill-eval-history.jsonl
 ```
 
-Bạn cần biết chất lượng đang tăng thật hay chỉ “cảm giác tốt hơn”.
+Mục tiêu là phát hiện regression thật, không đánh giá theo cảm giác. Giữ history toàn cục ở mức **1 dòng cho mỗi run** và giữ chi tiết từng prompt trong `runs/<run_id>/`.
 
-## 3. Scorecard đề xuất
+## 3. Scorecard và thang điểm
 
-Dùng trọng số này cho mỗi pack hoặc toàn package:
+Rubric chi tiết nằm ở:
 
-| Dimension | Weight |
-|---|---:|
-| Trigger accuracy | 20% |
-| Reference precision | 15% |
-| Output quality | 20% |
-| Evidence / validation quality | 15% |
-| Production safety | 10% |
-| Token efficiency | 10% |
-| Copilot readiness | 5% |
-| Originality / maintainability | 5% |
+- `evals/scoring-rubric.md`
+- `evals/scoring-rubric.vi-VN.md`
 
-Cách tính đơn giản:
+Giữ 8 nhóm điểm chính:
 
-```text
-weighted_score = Σ(score_0_to_5 × weight) × 20
-```
+- trigger accuracy;
+- reference precision;
+- output quality;
+- evidence / validation quality;
+- production safety;
+- token efficiency;
+- Copilot readiness;
+- originality / maintainability.
 
-Thang điểm:
+## 4. Cách quyết định nên sửa ở đâu
 
-| Score | Meaning |
-|---:|---|
-| 90–100 | Excellent / reference-grade |
-| 80–89 | Production-ready |
-| 70–79 | Usable but needs improvement |
-| 60–69 | Risky / needs focused fixes |
-| <60 | Not acceptable |
+| Pattern lỗi | Nên sửa ở đâu |
+|---|---|
+| Thiếu expected pack lặp lại | `agents/ce7-software-engineering.agent.md` hoặc `.github/copilot-instructions.md` |
+| Pack đúng nhưng thiếu reference | `skills/<pack>/SKILL.md` |
+| Reference đúng nhưng output nông | `skills/<pack>/references/<reference>.md` |
+| Mở quá nhiều pack/reference | token rules trong pack `SKILL.md` hoặc `.github/copilot-instructions.md` |
+| GPT và Claude cùng fail | package hiện tại thiếu rõ, nên sửa agent/skill |
+| Chỉ một model fail | ghi history, quan sát thêm trước khi sửa instruction |
+| Benchmark không bắt được lỗi mới | thêm benchmark row hoặc cập nhật scoring notes |
 
-## 4. Quy trình cải tiến chuẩn
+### Quy tắc vàng
 
-### Bước 1 — Chạy validation
+**Không sửa skill chỉ vì câu trả lời “nghe chưa hay”.**
 
-```bash
-python3 scripts/validate_hybrid_packs.py
-```
+Chỉ sửa khi benchmark + score + history chỉ ra lỗi lặp lại hoặc production risk rõ ràng.
 
-Nếu fail, sửa cấu trúc trước.
+## 5. Chu trình cải tiến chuẩn
 
-### Bước 2 — Chọn benchmark prompt
+1. Chạy structural validation.
+2. Chạy benchmark prompt đại diện.
+3. Chấm deterministic + semantic.
+4. Phân loại lỗi theo bảng ở trên.
+5. Chỉ patch 1–2 target quan trọng nhất.
+6. Re-run đúng fail cases để xác nhận regression đã được sửa.
 
-Chọn 5–10 prompt đại diện:
-
-- 2 prompt single-pack;
-- 2 prompt cross-domain;
-- 2 prompt high-risk security/data/release;
-- 1 prompt negative activation;
-- 1 prompt stack-specific.
-
-### Bước 3 — Chạy qua CE7 agent
-
-Với mỗi prompt, ghi lại:
-
-- pack được route;
-- references được mở;
-- output cuối;
-- số pack/reference bị mở sai;
-- thiếu gì trong output.
-
-### Bước 4 — Chấm bằng `skill-evaluator`
-
-Dùng output format của `skill-evaluator`:
-
-1. Verdict: PASS / WARN / FAIL.
-2. Scorecard.
-3. Structural checks.
-4. Routing findings.
-5. Token findings.
-6. External research findings.
-7. Risk-ranked fixes.
-8. Regression additions.
-
-### Bước 5 — Chỉ sửa chỗ có evidence
-
-Không sửa pack chỉ vì “có thể hay hơn”. Sửa khi benchmark cho thấy:
-
-- prompt route sai;
-- pack description mơ hồ;
-- reference thiếu trigger;
-- output thiếu evidence/test/rollback/security;
-- token bị bloat;
-- overlap giữa packs.
-
-### Bước 6 — Re-run validation + benchmark
-
-Sau patch:
-
-```bash
-python3 scripts/validate_hybrid_packs.py
-```
-
-Sau đó chạy lại prompt đã fail để xác nhận regression được sửa.
-
-## 5. Cách làm skills thông minh hơn mà không tốn token hơn
+## 6. Cách làm skill thông minh hơn mà không tốn token hơn
 
 ### Nên làm
 
-- Viết trigger cụ thể hơn trong pack description.
-- Thêm decision matrix ngắn thay vì prose dài.
-- Thêm benchmark prompt để bắt lỗi routing.
-- Đưa chi tiết dài vào `references/`, không đưa vào pack.
-- Tách “minimum bar” và “deep guidance”.
-- Thêm examples ngắn ở reference nếu giúp model chọn đúng.
-- Dùng negative activation: ghi rõ khi nào không dùng pack.
+- viết trigger cụ thể hơn trong pack description;
+- thêm decision matrix ngắn thay vì prose dài;
+- đưa chi tiết dài vào `references/`, không đưa vào pack;
+- thêm negative activation khi pack dễ bị route sai;
+- thêm benchmark prompt để bắt lỗi routing hoặc production-risk gap.
 
 ### Không nên làm
 
-- Thêm nhiều agents khi chưa có benchmark chứng minh cần.
-- Copy skill từ project khác vào CE7.
-- Nhồi tất cả security/performance/ops rules vào mọi pack.
-- Mở nhiều pack “cho chắc”.
-- Tăng line count để tạo cảm giác chuyên sâu.
-- Viết description kiểu tóm tắt workflow thay vì trigger.
+- thêm nhiều agents khi chưa có benchmark chứng minh cần;
+- copy skill từ project khác vào CE7;
+- nhồi tất cả security/performance/ops rules vào mọi pack;
+- mở nhiều pack “cho chắc”; 
+- tăng line count để tạo cảm giác chuyên sâu.
 
-## 6. Khi nào nên thêm agent mới?
+## 7. Khi nào nên thêm agent mới?
 
 Hiện tại chỉ nên có:
 
 - `ce7-software-engineering`
 - `skill-evaluator`
 
-Chỉ thêm `architecture-reviewer` nếu benchmark cho thấy lặp lại lỗi như:
+Chỉ thêm agent mới khi benchmark history cho thấy **lỗi lặp lại theo một loại judgment riêng** mà pack/reference sửa mãi không hết.
 
-- kiến trúc thiếu trade-off;
-- boundary sai;
-- over-engineering;
-- không xét ownership/team topology;
-- recommendation quá tactical.
+## 8. Chu kỳ cải tiến khuyến nghị
 
-Chỉ thêm `delivery-risk-reviewer` nếu benchmark cho thấy lặp lại lỗi như:
+### Hàng tuần hoặc sau thay đổi lớn
 
-- migration thiếu rollback;
-- release thiếu rollout gates;
-- không có SLO/alert/runbook;
-- thiếu feature flag hoặc compatibility plan;
-- production support path mơ hồ.
-
-Nếu lỗi chỉ là trigger/reference sai, sửa pack trước, chưa thêm agent.
-
-## 7. Chu kỳ cải tiến khuyến nghị
-
-### Hàng tuần hoặc sau mỗi thay đổi lớn
-
-1. Chạy validator.
-2. Chạy 10 benchmark prompts.
-3. Ghi report vào `reports/latest-skill-eval.md`.
-4. Thêm một dòng vào `reports/skill-eval-history.jsonl`.
-5. Patch tối đa 1–2 pack có điểm thấp nhất.
-6. Re-run benchmark fail cases.
+1. chạy validator;
+2. chạy benchmark;
+3. ghi report;
+4. append history;
+5. patch tối đa 1–2 target;
+6. re-run fail cases.
 
 ### Hàng tháng
 
-1. Review `docs/external-skill-research.md`.
-2. Tìm thêm pattern tốt từ workspace.
-3. Cập nhật `docs/skill-pack-quality-rubric.md` nếu quality bar thay đổi.
-4. Quyết định có cần agent mới không dựa trên benchmark history.
+1. review `docs/external-skill-research.md`;
+2. cập nhật `docs/skill-pack-quality-rubric.md` nếu quality bar thay đổi;
+3. xem có cần benchmark suite mới hoặc agent mới không.
 
-## 8. Definition of Done cho cải tiến pack
+## 9. Definition of Done cho cải tiến pack
 
 Một cải tiến pack hoàn tất khi:
 
@@ -280,5 +164,12 @@ Một cải tiến pack hoàn tất khi:
 - `.github/skills` sync với root `skills`;
 - README/instructions nếu bị ảnh hưởng đã cập nhật;
 - nếu học pattern từ project khác thì `external-skill-research.md` đã ghi nhận;
-- report mới được ghi vào `reports/latest-skill-eval.md`.
+- report mới được ghi vào `reports/latest-skill-eval.md` / `reports/latest-skill-eval.vi-VN.md`.
+
+## 10. Nên đọc tiếp gì?
+
+- Muốn chạy pipeline: `docs/pipeline-guide.vi-VN.md`
+- Muốn quickstart: `evals/file-based-benchmark-pipeline.vi-VN.md`
+- Muốn so sánh GPT và Claude: `evals/model-comparison-runbook.vi-VN.md`
+- Muốn xem rubric chi tiết: `evals/scoring-rubric.vi-VN.md`
 

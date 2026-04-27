@@ -1,88 +1,69 @@
-# Latest CE7 Skill Evaluation Report
+# Latest CE7 Skill Evaluation Snapshot
 
-**Date:** TBD  
-**Evaluator:** `skill-evaluator`  
-**Benchmark set:** `evals/routing-benchmark.jsonl`  
-**Validator result:** TBD
+[English](latest-skill-eval.md) | [Tiếng Việt](latest-skill-eval.vi-VN.md)
 
-## Summary
+> **You are here.** This is the latest **short run-level snapshot** synced into `reports/`.
+>
+> - Per-prompt details stay under `runs/<run_id>/`.
+> - Long-term history stays in `reports/skill-eval-history.jsonl` with **one row per run**.
+> - This file does not replace `summary.md`; it only keeps the highest-signal findings.
 
-| Metric | Result |
+## Current snapshot
+
+- **Run ID:** `smoke-reports-2`
+- **Generated:** 2026-04-27T13:17:57.938237+00:00
+- **Benchmark:** `evals/banking-insurance-benchmark.jsonl`
+- **Models:** `gpt`
+- **Outputs scored:** 2
+- **Semantic status:** `pending_skill_evaluator`
+
+## Deterministic scorecard
+
+| Metric | Value |
 |---|---:|
-| Prompts evaluated | TBD |
-| Average weighted score | TBD |
-| PASS prompts | TBD |
-| WARN prompts | TBD |
-| FAIL prompts | TBD |
-| Routing regressions | TBD |
-| Token regressions | TBD |
+| Average deterministic score | 100.0 |
+| PASS | 2 |
+| WARN | 0 |
+| FAIL | 0 |
 
-## Pack-Level Scores
+## Model scorecard
 
-| Pack | Trigger accuracy | Reference precision | Output quality | Token efficiency | Verdict |
-|---|---:|---:|---:|---:|---|
-| `core-engineering-pack` | TBD | TBD | TBD | TBD | TBD |
-| `data-database-analytics-pack` | TBD | TBD | TBD | TBD | TBD |
-| `security-access-pack` | TBD | TBD | TBD | TBD | TBD |
-| `platform-integration-pack` | TBD | TBD | TBD | TBD | TBD |
-| `resilience-performance-pack` | TBD | TBD | TBD | TBD | TBD |
-| `observability-release-pack` | TBD | TBD | TBD | TBD | TBD |
-| `storage-search-stack-pack` | TBD | TBD | TBD | TBD | TBD |
+| Model | Outputs | Avg score | PASS | WARN | FAIL | Avg words |
+|---|---:|---:|---:|---:|---:|---:|
+| gpt | 2 | 100.0 | 2 | 0 | 0 | 136.5 |
 
-## Prompt Findings
+## Highest-signal findings
 
-| Prompt ID | Expected packs | Actual packs | Expected references | Actual references | Score | Verdict | Notes |
-|---|---|---|---|---|---:|---|---|
-| TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD |
+- Missing expected packs: 0 output(s). Hotspots: -
+- Missing expected references: 0 output(s). Hotspots: -
+- Unexpected/prohibited activations: 0 output(s). Hotspots: -
+- Header/parser confidence issues: scanned=0, missing=0
+- Long outputs: 0 | bloated outputs: 0
 
-## Token Findings
+## Likely update targets
 
-- Packs opened unnecessarily: TBD
-- References opened unnecessarily: TBD
-- Missing references: TBD
-- Bloated answers: TBD
-- Repeated guidance: TBD
+| Target | Why | Evidence |
+|---|---|---|
+| - | No strong deterministic signal suggests an update yet. | - |
 
-## Quality Findings
+## Lowest-scoring cases
 
-- Strongest behavior: TBD
-- Weakest behavior: TBD
-- Missing evidence/test discipline: TBD
-- Security/data/release risks missed: TBD
-- Copilot layout friction: TBD
+| Model | Prompt | Score | Verdict | Main issue |
+|---|---|---:|---|---|
+| gpt | banking-001-payment-idempotency | 100 | PASS | no major deterministic issue |
+| gpt | banking-002-loan-origination-underwriting | 100 | PASS | no major deterministic issue |
 
-## Risk-Ranked Fixes
+## Artifacts
 
-### P0
+- `runs/<run_id>/report.json`: `runs/smoke-reports-2/report.json`
+- `runs/<run_id>/summary.md`: `runs/smoke-reports-2/summary.md`
+- `runs/<run_id>/scores.jsonl`: `runs/smoke-reports-2/scores.jsonl`
+- `runs/<run_id>/evaluator-prompts/`: `runs/smoke-reports-2/evaluator-prompts`
+- Global history: `reports/skill-eval-history.jsonl`
 
-- TBD
+## Rules for this report
 
-### P1
-
-- TBD
-
-### P2
-
-- TBD
-
-### P3
-
-- TBD
-
-## Regression Additions
-
-Add these prompts to benchmark suites:
-
-```jsonl
-{"id":"TBD","prompt":"TBD","expected_packs":[],"expected_references":[],"should_not_activate":[]}
-```
-
-## Decision
-
-- [ ] No change needed
-- [ ] Patch pack trigger(s)
-- [ ] Patch reference guidance
-- [ ] Add benchmark prompt(s)
-- [ ] Update evaluator/rubric
-- [ ] Consider new agent only after repeated benchmark failures
+- Do not duplicate full prompt-level findings here; keep them in `runs/<run_id>/`.
+- Treat this as the latest snapshot only; use `skill-eval-history.jsonl` for trends and regression checks.
+- After semantic evaluation, add details to run-local artifacts or a semantic artifact instead of bloating this file.
 

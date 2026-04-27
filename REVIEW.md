@@ -25,6 +25,7 @@ This report replaces the older pre-patch review. The previous findings about thi
 | External skill research | ✅ `docs/external-skill-research.md` records sibling-project patterns and originality notes |
 | Pack quality rubric | ✅ `docs/skill-pack-quality-rubric.md` defines trigger, reference, token, benchmark, security, release, and Copilot readiness gates |
 | Evaluation workflow | ✅ `docs/evaluation-improvement-playbook.vi-VN.md`, `evals/scoring-rubric.md`, and `reports/` templates added |
+| Real-world benchmark | ✅ `evals/banking-insurance-benchmark.jsonl` adds 10 banking / non-life insurance / bancassurance prompts for GPT vs Claude comparison |
 | Overall score | **Pending re-benchmark** |
 
 **Verdict**: The package is now structurally aligned with the Copilot-first hybrid-pack design. Re-score quality after running the new benchmark corpus through `skill-evaluator`.

@@ -63,15 +63,29 @@ software-engineering-agent/
     <7 pack skills>/SKILL.md
     <7 pack skills>/references/*.md
   evals/
+    banking-insurance-benchmark.jsonl
+    file-based-benchmark-pipeline.md
+    file-based-benchmark-pipeline.vi-VN.md
+    model-comparison-runbook.md
+    model-comparison-runbook.vi-VN.md
     routing-benchmark.jsonl
+    scoring-rubric.md
+    scoring-rubric.vi-VN.md
   docs/
+    evaluation-improvement-playbook.md
     external-skill-research.md
     evaluation-improvement-playbook.vi-VN.md
+    pipeline-guide.md
+    pipeline-guide.vi-VN.md
     skill-pack-quality-rubric.md
   reports/
+    README.md
+    README.vi-VN.md
     latest-skill-eval.md
+    latest-skill-eval.vi-VN.md
     skill-eval-history.jsonl
   scripts/
+    benchmark_pipeline.py
     validate_hybrid_packs.py
   instructions/
     principal-agent-maintenance.instructions.md
@@ -87,7 +101,27 @@ software-engineering-agent/
 - `.github/skills/` is the primary runtime target; root `skills/` mirrors the pack structure for repository maintenance.
 - `docs/external-skill-research.md` records patterns reviewed from sibling workspace projects.
 - `docs/skill-pack-quality-rubric.md` turns those patterns into reviewable quality gates.
-- `docs/evaluation-improvement-playbook.vi-VN.md` explains the recurring evaluation and improvement workflow.
+- `docs/evaluation-improvement-playbook.md` / `docs/evaluation-improvement-playbook.vi-VN.md` explain the recurring evaluation and improvement workflow.
+
+### Evaluation Documentation Map
+
+To reduce overlap, evaluation docs now have explicit ownership:
+
+- `docs/pipeline-guide.md` / `docs/pipeline-guide.vi-VN.md` → canonical end-to-end pipeline execution guide.
+- `docs/evaluation-improvement-playbook.md` / `docs/evaluation-improvement-playbook.vi-VN.md` → evaluation policy, fix-target logic, improvement cadence, and Definition of Done.
+- `evals/file-based-benchmark-pipeline.md` / `evals/file-based-benchmark-pipeline.vi-VN.md` → short quickstart commands only.
+- `evals/model-comparison-runbook.md` / `evals/model-comparison-runbook.vi-VN.md` → GPT-vs-Claude benchmarking for the banking/non-life insurance suite.
+- `evals/scoring-rubric.md` / `evals/scoring-rubric.vi-VN.md` → scoring criteria only.
+
+### Reports Map
+
+`reports/` now has explicit ownership too:
+
+- `reports/latest-skill-eval.md` / `reports/latest-skill-eval.vi-VN.md` → latest short run-level snapshot only.
+- `reports/skill-eval-history.jsonl` → append-only machine-readable history with **one row per run**.
+- `reports/README.md` / `reports/README.vi-VN.md` → schema and ownership contract.
+
+Detailed prompt-by-prompt findings should stay under `runs/<run_id>/`, especially `report.json`, `summary.md`, and `scores.jsonl`.
 
 ## Optimization Goals
 
@@ -165,7 +199,7 @@ The validator checks exactly 7 peer pack skills, 33 references, 2 agents, no def
 
 ## Next Steps for Evaluation and Improvement
 
-1. Read `docs/evaluation-improvement-playbook.vi-VN.md` for the 5-layer evaluation workflow.
+1. Read `docs/evaluation-improvement-playbook.md` or `docs/evaluation-improvement-playbook.vi-VN.md` for the evaluation policy and improvement loop.
 2. Run structural validation:
 
    ```bash
@@ -175,8 +209,67 @@ The validator checks exactly 7 peer pack skills, 33 references, 2 agents, no def
 3. Select 5–10 prompts from `evals/routing-benchmark.jsonl`.
 4. Run those prompts through `ce7-software-engineering` and record activated packs/references.
 5. Use `agents/skill-evaluator.agent.md` to score outputs with `evals/scoring-rubric.md`.
-6. Record results in `reports/latest-skill-eval.md` and append history to `reports/skill-eval-history.jsonl`.
+6. Sync the latest snapshot to `reports/latest-skill-eval.md` / `reports/latest-skill-eval.vi-VN.md` and append **one run-level row** to `reports/skill-eval-history.jsonl`.
 7. Patch packs/references only when benchmark evidence shows routing, reference precision, output quality, or token-bloat issues.
+
+### Banking and Non-Life Insurance Benchmark
+
+- `evals/banking-insurance-benchmark.jsonl` contains 10 realistic banking, non-life insurance, and bancassurance cases.
+- `evals/model-comparison-runbook.md` / `evals/model-comparison-runbook.vi-VN.md` explain how to replay the same cases on GPT and Claude models.
+- `evals/file-based-benchmark-pipeline.md` / `evals/file-based-benchmark-pipeline.vi-VN.md` provide the short quickstart for file-based execution.
+- `docs/pipeline-guide.md` / `docs/pipeline-guide.vi-VN.md` are the canonical guides for prepare → output → score → evaluator → report/history.
+- Use `evals/scoring-rubric.md` or `evals/scoring-rubric.vi-VN.md` to score both models consistently.
+- Use `reports/README.md` / `reports/README.vi-VN.md` to keep global reports concise and run-level.
+
+### File-Based Benchmark Pipeline
+
+```bash
+python3 scripts/benchmark_pipeline.py prepare --run-id 2026-04-27-gpt-claude-v1 --models gpt,claude
+python3 scripts/benchmark_pipeline.py score --run-id 2026-04-27-gpt-claude-v1 --append-history
+python3 scripts/benchmark_pipeline.py evaluator-prompts --run-id 2026-04-27-gpt-claude-v1
+```
+
+Save model outputs to `runs/<run_id>/outputs/<model>/<prompt_id>.md` before running `score`.
+
+### One-command Auto Run (switch model only)
+
+If you want the pipeline to run automatically end-to-end for one provider in one command:
+
+```bash
+# GPT
+export OPENAI_API_KEY="<your_openai_key>"
+python3 scripts/benchmark_pipeline.py run --run-id 2026-04-27-gpt-auto --model gpt
+
+# Claude
+export ANTHROPIC_API_KEY="<your_anthropic_key>"
+python3 scripts/benchmark_pipeline.py run --run-id 2026-04-27-claude-auto --model claude
+```
+
+What `run` does automatically:
+
+1. prepare prompts for the selected model;
+2. call the provider API for each prompt and save outputs;
+3. run deterministic scoring with `--append-history`;
+4. sync `reports/latest-skill-eval*` and append one run row to history;
+5. generate `evaluator-prompts/` for semantic scoring.
+
+### No API keys (Copilot chat windows) — recommended manual automation
+
+If you do not have API keys and want a Copilot-friendly flow:
+
+```bash
+# 1) Prepare prompts + output stubs + worklist for GPT and Claude
+python3 scripts/benchmark_pipeline.py implement \
+  --run-id 2026-04-27-gpt-claude-manual \
+  --models gpt,claude
+
+# 2) After pasting model outputs into files, finalize scoring and evaluator prompts
+python3 scripts/benchmark_pipeline.py finalize \
+  --run-id 2026-04-27-gpt-claude-manual \
+  --models gpt,claude
+```
+
+`implement` creates run-local guidance under `runs/<run_id>/manual/README.md` and `runs/<run_id>/manual/worklist.md`.
 
 ## Expected Output Shapes
 

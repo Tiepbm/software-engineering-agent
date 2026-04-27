@@ -63,15 +63,29 @@ software-engineering-agent/
     <7 pack skills>/SKILL.md
     <7 pack skills>/references/*.md
   evals/
+    banking-insurance-benchmark.jsonl
+    file-based-benchmark-pipeline.md
+    file-based-benchmark-pipeline.vi-VN.md
+    model-comparison-runbook.md
+    model-comparison-runbook.vi-VN.md
     routing-benchmark.jsonl
+    scoring-rubric.md
+    scoring-rubric.vi-VN.md
   docs/
+    evaluation-improvement-playbook.md
     external-skill-research.md
     evaluation-improvement-playbook.vi-VN.md
+    pipeline-guide.md
+    pipeline-guide.vi-VN.md
     skill-pack-quality-rubric.md
   reports/
+    README.md
+    README.vi-VN.md
     latest-skill-eval.md
+    latest-skill-eval.vi-VN.md
     skill-eval-history.jsonl
   scripts/
+    benchmark_pipeline.py
     validate_hybrid_packs.py
   instructions/
     principal-agent-maintenance.instructions.md
@@ -87,7 +101,27 @@ software-engineering-agent/
 - `.github/skills/` là target runtime chính; `skills/` ở root mirror cùng cấu trúc để bảo trì repository.
 - `docs/external-skill-research.md` ghi lại các pattern đã tham khảo từ project khác trong workspace.
 - `docs/skill-pack-quality-rubric.md` chuyển các pattern đó thành quality gates có thể review.
-- `docs/evaluation-improvement-playbook.vi-VN.md` hướng dẫn vòng đánh giá và cải tiến agent/skills.
+- `docs/evaluation-improvement-playbook.md` / `docs/evaluation-improvement-playbook.vi-VN.md` hướng dẫn vòng đánh giá và cải tiến agent/skills.
+
+### Bản đồ tài liệu đánh giá
+
+Để tránh trùng lặp và nhiễu thông tin, các tài liệu đánh giá hiện có ranh giới rõ ràng:
+
+- `docs/pipeline-guide.md` / `docs/pipeline-guide.vi-VN.md` → guide chuẩn cho pipeline end-to-end.
+- `docs/evaluation-improvement-playbook.md` / `docs/evaluation-improvement-playbook.vi-VN.md` → chính sách đánh giá, logic quyết định update, cadence cải tiến, Definition of Done.
+- `evals/file-based-benchmark-pipeline.md` / `evals/file-based-benchmark-pipeline.vi-VN.md` → quickstart lệnh ngắn.
+- `evals/model-comparison-runbook.md` / `evals/model-comparison-runbook.vi-VN.md` → runbook so sánh GPT vs Claude cho bộ case banking / non-life insurance.
+- `evals/scoring-rubric.md` / `evals/scoring-rubric.vi-VN.md` → tiêu chí chấm điểm.
+
+### Bản đồ reports
+
+`reports/` giờ cũng có ownership rõ ràng:
+
+- `reports/latest-skill-eval.md` / `reports/latest-skill-eval.vi-VN.md` → snapshot ngắn gọn của run mới nhất.
+- `reports/skill-eval-history.jsonl` → lịch sử machine-readable dạng append-only với **1 dòng cho mỗi run**.
+- `reports/README.md` / `reports/README.vi-VN.md` → contract và schema của reports.
+
+Các findings chi tiết theo từng prompt nên nằm trong `runs/<run_id>/`, đặc biệt là `report.json`, `summary.md` và `scores.jsonl`.
 
 ## Mục tiêu tối ưu
 
@@ -165,7 +199,7 @@ Validator kiểm tra đúng 7 peer pack skills, 33 references, 2 agents, chưa c
 
 ## Bước tiếp theo để đánh giá và cải tiến
 
-1. Đọc `docs/evaluation-improvement-playbook.vi-VN.md` để hiểu workflow đánh giá 5 lớp.
+1. Đọc `docs/evaluation-improvement-playbook.md` hoặc `docs/evaluation-improvement-playbook.vi-VN.md` để hiểu chính sách đánh giá và vòng cải tiến.
 2. Chạy structural validation:
 
    ```bash
@@ -175,8 +209,78 @@ Validator kiểm tra đúng 7 peer pack skills, 33 references, 2 agents, chưa c
 3. Chọn 5–10 prompts từ `evals/routing-benchmark.jsonl`.
 4. Chạy các prompt đó với `ce7-software-engineering` và ghi lại pack/reference được kích hoạt.
 5. Dùng `agents/skill-evaluator.agent.md` để chấm output theo `evals/scoring-rubric.md`.
-6. Ghi kết quả vào `reports/latest-skill-eval.md` và thêm dòng lịch sử vào `reports/skill-eval-history.jsonl`.
+6. Đồng bộ snapshot mới nhất vào `reports/latest-skill-eval.md` / `reports/latest-skill-eval.vi-VN.md` và thêm **một dòng ở mức run** vào `reports/skill-eval-history.jsonl`.
 7. Chỉ patch pack/reference khi benchmark chỉ ra lỗi cụ thể về routing, reference precision, output quality hoặc token bloat.
+
+### Benchmark nghiệp vụ Ngân hàng và Bảo hiểm phi nhân thọ
+
+- `evals/banking-insurance-benchmark.jsonl` chứa 10 case thực tế cho banking, non-life insurance và bancassurance.
+- `evals/model-comparison-runbook.md` / `evals/model-comparison-runbook.vi-VN.md` hướng dẫn chạy cùng một case trên GPT và Claude để so sánh.
+- `evals/file-based-benchmark-pipeline.md` / `evals/file-based-benchmark-pipeline.vi-VN.md` là quickstart cho pipeline qua file.
+- `docs/pipeline-guide.md` / `docs/pipeline-guide.vi-VN.md` là guide đầy đủ cho prepare → output → score → evaluator → report/history.
+- Dùng `evals/scoring-rubric.md` hoặc `evals/scoring-rubric.vi-VN.md` để chấm điểm nhất quán giữa model.
+- Dùng `reports/README.md` / `reports/README.vi-VN.md` để giữ reports toàn cục ngắn gọn và đúng mức run.
+
+### Pipeline tự động qua file
+
+```bash
+python3 scripts/benchmark_pipeline.py prepare --run-id 2026-04-27-gpt-claude-v1 --models gpt,claude
+python3 scripts/benchmark_pipeline.py score --run-id 2026-04-27-gpt-claude-v1 --append-history
+python3 scripts/benchmark_pipeline.py evaluator-prompts --run-id 2026-04-27-gpt-claude-v1
+```
+
+Model outputs cần được lưu vào `runs/<run_id>/outputs/<model>/<prompt_id>.md` trước khi chạy lệnh `score`.
+
+### Auto end-to-end bằng 1 lệnh (chỉ switch model)
+
+Nếu bạn muốn chạy toàn bộ pipeline tự động và chỉ chọn model:
+
+```bash
+# GPT
+export OPENAI_API_KEY="<your_openai_key>"
+python3 scripts/benchmark_pipeline.py run --run-id 2026-04-27-gpt-auto --model gpt
+
+# Claude
+export ANTHROPIC_API_KEY="<your_anthropic_key>"
+python3 scripts/benchmark_pipeline.py run --run-id 2026-04-27-claude-auto --model claude
+```
+
+Lệnh `run` sẽ tự động:
+
+1. prepare prompts cho model đã chọn;
+2. gọi API của provider cho từng prompt và lưu output;
+3. chấm deterministic với `--append-history`;
+4. sync `reports/latest-skill-eval*` và append 1 dòng history ở mức run;
+5. tạo `evaluator-prompts/` cho semantic scoring.
+
+### Không có API key (Copilot chat windows) — chế độ đề xuất
+
+Nếu bạn không có API key và muốn chạy theo kiểu Copilot thủ công nhưng vẫn gần tự động:
+
+```bash
+# 1) Chuẩn bị toàn bộ prompts + output stubs + worklist cho cả GPT và Claude
+python3 scripts/benchmark_pipeline.py implement \
+  --run-id 2026-04-27-gpt-claude-manual \
+  --models gpt,claude
+
+# 2) Sau khi dán xong output vào files, finalize để chấm và sinh evaluator-prompts
+python3 scripts/benchmark_pipeline.py finalize \
+  --run-id 2026-04-27-gpt-claude-manual \
+  --models gpt,claude
+```
+
+`implement` sẽ tạo:
+
+- `runs/<run_id>/prompts/<model>/*.md`
+- `runs/<run_id>/outputs/<model>/*.md` (stub sẵn để bạn paste output)
+- `runs/<run_id>/manual/README.md`
+- `runs/<run_id>/manual/worklist.md`
+
+`finalize` sẽ:
+
+1. kiểm tra output còn thiếu hoặc còn marker `CE7_OUTPUT_PENDING`;
+2. chấm deterministic + sync reports/history;
+3. sinh `evaluator-prompts/`.
 
 ## Định dạng output mặc định
 
