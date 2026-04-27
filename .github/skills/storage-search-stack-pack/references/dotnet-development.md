@@ -135,3 +135,181 @@ Reliability requires `CancellationToken` everywhere, request timeouts (`RequestT
 - Connection pool exhaustion shows as request timeouts, not DB errors — usually caused by leaked `DbContext`s or over-large per-instance pool × autoscaled replicas.
 - Source-generated JSON (`JsonSerializerContext`) can't serialize types it wasn't told about — runtime `NotSupportedException` in production only.
 
+## Code Examples
+
+### Idempotency Middleware
+
+```csharp
+// Middleware that checks idempotency key before reaching the endpoint
+public class IdempotencyMiddleware(RequestDelegate next, IIdempotencyStore store)
+{
+    public async Task InvokeAsync(HttpContext context)
+    {
+        if (context.Request.Method != "POST") { await next(context); return; }
+
+        if (!context.Request.Headers.TryGetValue("Idempotency-Key", out var keyHeader))
+        {
+            context.Response.StatusCode = 400;
+            await context.Response.WriteAsJsonAsync(new ProblemDetails
+                { Title = "Missing Idempotency-Key header", Status = 400 });
+            return;
+        }
+
+        var tenantId = context.User.FindFirst("tenant_id")?.Value;
+        var key = new IdempotencyKey(tenantId!, keyHeader.ToString());
+
+        var existing = await store.GetAsync(key, context.RequestAborted);
+        if (existing is not null)
+        {
+            // Replay stored response
+            context.Response.StatusCode = existing.StatusCode;
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsync(existing.Body, context.RequestAborted);
+            return;
+        }
+
+        // Capture response for storage
+        var originalBody = context.Response.Body;
+        using var memStream = new MemoryStream();
+        context.Response.Body = memStream;
+
+        await next(context);
+
+        memStream.Seek(0, SeekOrigin.Begin);
+        var responseBody = await new StreamReader(memStream).ReadToEndAsync();
+        await store.SetAsync(key, new StoredResponse(context.Response.StatusCode, responseBody),
+            TimeSpan.FromHours(24), context.RequestAborted);
+
+        memStream.Seek(0, SeekOrigin.Begin);
+        await memStream.CopyToAsync(originalBody, context.RequestAborted);
+    }
+}
+```
+
+### Outbox Pattern with EF Core
+
+```csharp
+// Write state + outbox event in one transaction
+public class PaymentService(AppDbContext db, TimeProvider clock)
+{
+    public async Task<Payment> CaptureAsync(Guid paymentId, string pspRef, CancellationToken ct)
+    {
+        var payment = await db.Payments
+            .Where(p => p.Id == paymentId)
+            .FirstOrDefaultAsync(ct) ?? throw new NotFoundException();
+
+        payment.Capture(pspRef, clock.GetUtcNow());
+
+        db.OutboxEvents.Add(new OutboxEvent
+        {
+            AggregateId = payment.Id,
+            EventType = "payment.captured",
+            EventId = Guid.NewGuid(),
+            Payload = JsonSerializer.Serialize(new { payment.Id, payment.Amount, pspRef }),
+            CorrelationId = Activity.Current?.Id,
+            CreatedAt = clock.GetUtcNow()
+        });
+
+        await db.SaveChangesAsync(ct); // Single transaction
+        return payment;
+    }
+}
+
+// Background relay worker
+public class OutboxRelayService(IServiceScopeFactory scopeFactory, IKafkaProducer kafka)
+    : BackgroundService
+{
+    protected override async Task ExecuteAsync(CancellationToken ct)
+    {
+        while (!ct.IsCancellationRequested)
+        {
+            using var scope = scopeFactory.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+            var pending = await db.OutboxEvents
+                .Where(e => e.PublishedAt == null)
+                .OrderBy(e => e.CreatedAt)
+                .Take(100)
+                .ToListAsync(ct);
+
+            foreach (var evt in pending)
+            {
+                try
+                {
+                    await kafka.ProduceAsync(evt.EventType, evt.AggregateId.ToString(), evt.Payload, ct);
+                    evt.PublishedAt = DateTimeOffset.UtcNow;
+                }
+                catch (Exception ex)
+                {
+                    evt.RetryCount++;
+                    // Log but continue — don't block other events
+                }
+            }
+            await db.SaveChangesAsync(ct);
+            await Task.Delay(500, ct);
+        }
+    }
+}
+```
+
+### Resource Authorization Handler
+
+```csharp
+public record ClaimResourceRequirement(string Action) : IAuthorizationRequirement;
+
+public class ClaimAuthorizationHandler(IClaimRepository claims)
+    : AuthorizationHandler<ClaimResourceRequirement, Guid>
+{
+    protected override async Task HandleRequirementAsync(
+        AuthorizationHandlerContext context, ClaimResourceRequirement requirement, Guid claimId)
+    {
+        var userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var claim = await claims.FindByIdAsync(claimId);
+        if (claim is null) return; // Will result in 404 at endpoint level
+
+        var isOwner = claim.AssigneeId.ToString() == userId;
+        var isAdmin = context.User.IsInRole("Admin");
+
+        switch (requirement.Action)
+        {
+            case "View" when isOwner || isAdmin:
+            case "Edit" when isOwner:
+            case "Approve" when isAdmin && !isOwner: // Separation of duties
+                context.Succeed(requirement);
+                break;
+        }
+    }
+}
+
+// Usage in endpoint
+app.MapPost("/claims/{id}/approve", async (Guid id, IAuthorizationService auth, HttpContext ctx) =>
+{
+    var result = await auth.AuthorizeAsync(ctx.User, id, new ClaimResourceRequirement("Approve"));
+    if (!result.Succeeded) return Results.Forbid();
+    // ... approve logic
+});
+```
+
+### HttpClient with Resilience (.NET 8+)
+
+```csharp
+// Registration in Program.cs
+builder.Services.AddHttpClient<PspClient>(client =>
+{
+    client.BaseAddress = new Uri("https://psp-api.example.com");
+    client.Timeout = TimeSpan.FromSeconds(15); // Total timeout
+})
+.AddStandardResilienceHandler(options =>
+{
+    options.Retry.MaxRetryAttempts = 3;
+    options.Retry.Delay = TimeSpan.FromMilliseconds(500);
+    options.Retry.BackoffType = DelayBackoffType.Exponential;
+    options.Retry.ShouldHandle = args => ValueTask.FromResult(
+        args.Outcome.Result?.StatusCode is HttpStatusCode.ServiceUnavailable
+        or HttpStatusCode.TooManyRequests);
+    options.CircuitBreaker.FailureRatio = 0.5;
+    options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(30);
+    options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(5); // Per-attempt
+});
+```
+

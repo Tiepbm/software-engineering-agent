@@ -137,3 +137,133 @@ Reliability requires error boundaries, resilient API state handling (retry safe 
 - **Date/timezone bugs**: `new Date(string)` parses inconsistently across browsers — always use ISO 8601 + `date-fns-tz` or `Temporal` (when available).
 - **Service worker** caching old bundles after deploy unless cache-busting + skipWaiting strategy is correct.
 
+## Code Examples
+
+### TanStack Query with Auth Refresh
+
+```tsx
+// api/client.ts — centralized HTTP client
+const apiClient = {
+  async fetch<T>(url: string, options?: RequestInit): Promise<T> {
+    const token = await getAccessToken(); // from auth store
+    const res = await fetch(`${BASE_URL}${url}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        'X-Correlation-Id': crypto.randomUUID(),
+        ...options?.headers,
+      },
+      signal: options?.signal ?? AbortSignal.timeout(30_000),
+    });
+    if (res.status === 401) {
+      await refreshToken(); // silent refresh
+      return apiClient.fetch(url, options); // retry once
+    }
+    if (!res.ok) throw new ApiError(res.status, await res.json());
+    return res.json();
+  }
+};
+
+// hooks/useClaims.ts — query with proper key discipline
+export function useClaims(filters: ClaimFilters) {
+  return useQuery({
+    queryKey: ['claims', filters.tenantId, filters.status, filters.page],
+    queryFn: ({ signal }) => apiClient.fetch<ClaimList>(
+      `/v1/claims?${new URLSearchParams(filters)}`, { signal }
+    ),
+    staleTime: 30_000, // 30s freshness tolerance
+    placeholderData: keepPreviousData, // smooth pagination
+  });
+}
+```
+
+### Idempotent Form Submission
+
+```tsx
+function PaymentForm() {
+  const [idempotencyKey] = useState(() => crypto.randomUUID()); // stable per mount
+  const mutation = useMutation({
+    mutationFn: (data: PaymentInput) => apiClient.fetch('/v1/payments', {
+      method: 'POST',
+      headers: { 'Idempotency-Key': idempotencyKey },
+      body: JSON.stringify(data),
+    }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['payments'] }),
+  });
+
+  return (
+    <form onSubmit={handleSubmit(data => mutation.mutate(data))}>
+      {/* form fields */}
+      <button type="submit" disabled={mutation.isPending}>
+        {mutation.isPending ? 'Processing...' : 'Submit Payment'}
+      </button>
+      {mutation.isError && <ErrorMessage error={mutation.error} />}
+    </form>
+  );
+}
+```
+
+### Error Boundary with Telemetry
+
+```tsx
+class AppErrorBoundary extends Component<PropsWithChildren, { error?: Error }> {
+  state: { error?: Error } = {};
+
+  static getDerivedStateFromError(error: Error) { return { error }; }
+
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    // Report to telemetry with correlation context
+    reportError({
+      error,
+      componentStack: info.componentStack,
+      correlationId: getCurrentCorrelationId(),
+      userId: getCurrentUserId(), // safe reference, not PII
+      route: window.location.pathname,
+    });
+  }
+
+  render() {
+    if (this.state.error) {
+      return (
+        <div role="alert">
+          <h2>Something went wrong</h2>
+          <p>Our team has been notified. Please try again.</p>
+          <button onClick={() => this.setState({ error: undefined })}>Retry</button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+```
+
+### Masked Data Display (Regulated)
+
+```tsx
+function MaskedField({ value, label, onReveal }: {
+  value: string; label: string; onReveal: () => void;
+}) {
+  const [revealed, setRevealed] = useState(false);
+  const masked = value.replace(/.(?=.{4})/g, '*'); // show last 4
+
+  const handleReveal = () => {
+    setRevealed(true);
+    onReveal(); // triggers audit event via API
+    setTimeout(() => setRevealed(false), 30_000); // auto-hide after 30s
+  };
+
+  return (
+    <div>
+      <label>{label}</label>
+      <span aria-live="polite">{revealed ? value : masked}</span>
+      {!revealed && (
+        <button onClick={handleReveal} aria-label={`Reveal ${label}`}>
+          Show
+        </button>
+      )}
+    </div>
+  );
+}
+```
+

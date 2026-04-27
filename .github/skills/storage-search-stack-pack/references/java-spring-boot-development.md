@@ -141,3 +141,172 @@ Reliability requires timeouts on every external call, bounded retries around saf
 - Virtual thread pinning via `synchronized` reduces concurrency to platform-thread count — invisible until load testing.
 - `@Transactional(readOnly = true)` on Hibernate enables flush-mode skip; accidental writes inside read-only TX silently fail at flush.
 
+## Code Examples
+
+### Transactional Outbox Pattern
+
+```java
+// 1. Outbox entity
+@Entity
+@Table(name = "outbox_events")
+public class OutboxEvent {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private UUID aggregateId;
+    private String eventType;
+    @Column(unique = true) private UUID eventId;
+    @JdbcTypeCode(SqlTypes.JSON) private String payload;
+    private UUID correlationId;
+    private Instant createdAt;
+    private Instant publishedAt; // null = not yet published
+    private int retryCount;
+}
+
+// 2. Service writes state + outbox in one transaction
+@Service
+@RequiredArgsConstructor
+public class PaymentService {
+    private final PaymentRepository payments;
+    private final OutboxRepository outbox;
+
+    @Transactional
+    public Payment capturePayment(CaptureCommand cmd) {
+        Payment payment = payments.findByIdAndVersion(cmd.paymentId(), cmd.expectedVersion())
+            .orElseThrow(() -> new OptimisticLockException("Payment modified"));
+        payment.capture(cmd.pspReference());
+        payments.save(payment);
+
+        outbox.save(OutboxEvent.builder()
+            .aggregateId(payment.getId())
+            .eventType("payment.captured")
+            .eventId(UUID.randomUUID())
+            .payload(toJson(new PaymentCapturedEvent(payment)))
+            .correlationId(cmd.correlationId())
+            .createdAt(Instant.now())
+            .build());
+        return payment;
+    }
+}
+
+// 3. Relay worker publishes and marks as sent
+@Component @RequiredArgsConstructor
+public class OutboxRelay {
+    private final OutboxRepository outbox;
+    private final KafkaTemplate<String, String> kafka;
+
+    @Scheduled(fixedDelay = 500)
+    @Transactional
+    public void relay() {
+        List<OutboxEvent> pending = outbox.findTop100ByPublishedAtIsNullOrderByCreatedAt();
+        for (OutboxEvent event : pending) {
+            try {
+                kafka.send("payments.events", event.getAggregateId().toString(), event.getPayload()).get();
+                event.setPublishedAt(Instant.now());
+            } catch (Exception e) {
+                event.setRetryCount(event.getRetryCount() + 1);
+                log.warn("Outbox relay failed for event {}: {}", event.getEventId(), e.getMessage());
+            }
+        }
+    }
+}
+```
+
+### Idempotent Kafka Consumer
+
+```java
+@Component @RequiredArgsConstructor
+public class ClaimEventConsumer {
+    private final ProcessedEventRepository processedEvents;
+    private final ClaimService claimService;
+
+    @KafkaListener(topics = "claims.events", groupId = "claim-processor")
+    @Transactional
+    public void handle(ConsumerRecord<String, String> record) {
+        ClaimEvent event = parse(record.value());
+
+        // Idempotency check: skip if already processed
+        if (processedEvents.existsByEventId(event.eventId())) {
+            log.info("Skipping duplicate event: {}", event.eventId());
+            return;
+        }
+
+        // Process
+        claimService.applyEvent(event);
+
+        // Mark as processed (in same transaction)
+        processedEvents.save(new ProcessedEvent(event.eventId(), Instant.now()));
+    }
+}
+```
+
+### Resource-Level Authorization
+
+```java
+@Component
+public class ClaimOwnershipChecker implements PermissionEvaluator {
+    private final ClaimRepository claims;
+
+    @Override
+    public boolean hasPermission(Authentication auth, Object target, Object permission) {
+        if (target instanceof UUID claimId) {
+            Claim claim = claims.findById(claimId).orElse(null);
+            if (claim == null) return false;
+
+            UserPrincipal user = (UserPrincipal) auth.getPrincipal();
+            return switch (permission.toString()) {
+                case "VIEW" -> claim.getAssigneeId().equals(user.getId())
+                    || user.getRoles().contains("ADMIN");
+                case "APPROVE" -> user.getRoles().contains("SENIOR_ADJUSTER")
+                    && !claim.getAssigneeId().equals(user.getId()); // separation of duties
+                default -> false;
+            };
+        }
+        return false;
+    }
+}
+
+// Usage in service
+@PreAuthorize("hasPermission(#claimId, 'APPROVE')")
+public Claim approveClaim(UUID claimId, ApprovalCommand cmd) { ... }
+```
+
+### Resilience4j Circuit Breaker + Retry
+
+```java
+@Configuration
+public class ResilienceConfig {
+    @Bean
+    public CircuitBreakerConfig cbConfig() {
+        return CircuitBreakerConfig.custom()
+            .failureRateThreshold(50)
+            .waitDurationInOpenState(Duration.ofSeconds(30))
+            .slidingWindowSize(10)
+            .permittedNumberOfCallsInHalfOpenState(2)
+            .build();
+    }
+}
+
+@Service @RequiredArgsConstructor
+public class PspClient {
+    private final RestClient restClient;
+
+    @CircuitBreaker(name = "psp", fallbackMethod = "pspFallback")
+    @Retry(name = "psp", fallbackMethod = "pspFallback")
+    @TimeLimiter(name = "psp")
+    public PspResponse submitPayment(PspRequest request) {
+        return restClient.post()
+            .uri("/v1/payments")
+            .header("Idempotency-Key", request.idempotencyKey().toString())
+            .body(request)
+            .retrieve()
+            .body(PspResponse.class);
+    }
+
+    private PspResponse pspFallback(PspRequest request, Exception ex) {
+        log.error("PSP unavailable for payment {}: {}", request.paymentId(), ex.getMessage());
+        // Return pending status — reconciliation job will resolve later
+        return PspResponse.pending(request.paymentId(), "PSP_UNAVAILABLE");
+    }
+}
+```
+

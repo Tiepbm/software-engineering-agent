@@ -147,3 +147,163 @@ Reliability requires network-state handling, crash reporting with native symbols
 - **Image memory**: loading full-resolution camera photos (10MB+) into list rows OOMs the app on low-RAM devices.
 - **App Store / Play Store rejections**: missing permission usage strings (iOS `NSCameraUsageDescription` etc.), missing privacy manifest, undeclared encryption export — surface in store review weeks after build.
 
+## Code Examples
+
+### Secure Storage + Biometric Gate
+
+```typescript
+// services/secureAuth.ts
+import * as SecureStore from 'expo-secure-store';
+import * as LocalAuthentication from 'expo-local-authentication';
+
+const TOKEN_KEY = 'auth_refresh_token';
+
+export async function storeToken(token: string): Promise<void> {
+  await SecureStore.setItemAsync(TOKEN_KEY, token, {
+    keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+    requireAuthentication: true, // biometric required to read
+  });
+}
+
+export async function getTokenWithBiometric(): Promise<string | null> {
+  const { success } = await LocalAuthentication.authenticateAsync({
+    promptMessage: 'Xác thực để tiếp tục',
+    fallbackLabel: 'Dùng mã PIN',
+    disableDeviceFallback: false,
+  });
+  if (!success) return null;
+  return SecureStore.getItemAsync(TOKEN_KEY);
+}
+
+// NEVER use AsyncStorage for tokens in regulated apps
+// AsyncStorage is plaintext on disk — readable with device access
+```
+
+### Offline Queue with Idempotency
+
+```typescript
+// services/offlineQueue.ts
+import { MMKV } from 'react-native-mmkv';
+import NetInfo from '@react-native-community/netinfo';
+
+interface QueuedOperation {
+  id: string; // idempotency key
+  endpoint: string;
+  method: 'POST' | 'PUT';
+  body: object;
+  createdAt: number;
+  retryCount: number;
+  status: 'pending' | 'syncing' | 'failed';
+}
+
+const storage = new MMKV({ id: 'offline-queue' });
+
+export function enqueue(op: Omit<QueuedOperation, 'id' | 'createdAt' | 'retryCount' | 'status'>): string {
+  const id = crypto.randomUUID();
+  const operation: QueuedOperation = {
+    ...op, id, createdAt: Date.now(), retryCount: 0, status: 'pending',
+  };
+  const queue = getQueue();
+  queue.push(operation);
+  storage.set('queue', JSON.stringify(queue));
+  return id;
+}
+
+export async function syncQueue(): Promise<void> {
+  const isConnected = (await NetInfo.fetch()).isConnected;
+  if (!isConnected) return;
+
+  const queue = getQueue().filter(op => op.status === 'pending');
+  for (const op of queue) {
+    try {
+      op.status = 'syncing';
+      await apiClient.fetch(op.endpoint, {
+        method: op.method,
+        headers: { 'Idempotency-Key': op.id }, // safe retry
+        body: JSON.stringify(op.body),
+      });
+      removeFromQueue(op.id);
+    } catch (error) {
+      op.retryCount++;
+      op.status = op.retryCount >= 3 ? 'failed' : 'pending';
+      updateInQueue(op);
+    }
+  }
+}
+
+// Auto-sync on reconnect
+NetInfo.addEventListener(state => {
+  if (state.isConnected) syncQueue();
+});
+```
+
+### Signed URL Document Upload
+
+```typescript
+// hooks/useDocumentUpload.ts
+export function useDocumentUpload(claimId: string) {
+  return useMutation({
+    mutationFn: async (file: { uri: string; type: string; name: string }) => {
+      // 1. Get signed URL from backend (authorized, short-lived)
+      const { uploadUrl, documentId } = await apiClient.fetch<SignedUrlResponse>(
+        `/v1/claims/${claimId}/documents/upload-url`,
+        { method: 'POST', body: JSON.stringify({ contentType: file.type, fileName: file.name }) }
+      );
+
+      // 2. Upload directly to S3 (bypasses API server for large files)
+      const response = await fetch(uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type },
+        body: await fetch(file.uri).then(r => r.blob()),
+      });
+      if (!response.ok) throw new Error('Upload failed');
+
+      // 3. Confirm upload to backend (triggers malware scan)
+      await apiClient.fetch(`/v1/claims/${claimId}/documents/${documentId}/confirm`, {
+        method: 'POST',
+      });
+      return documentId;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['claims', claimId, 'documents'] }),
+  });
+}
+```
+
+### Deep Link with Auth Validation
+
+```typescript
+// navigation/deepLinkHandler.ts
+import * as Linking from 'expo-linking';
+import { useEffect } from 'react';
+
+export function useDeepLinkHandler(navigation: NavigationProp) {
+  useEffect(() => {
+    // Handle cold start
+    Linking.getInitialURL().then(url => { if (url) handleDeepLink(url); });
+
+    // Handle warm start
+    const sub = Linking.addEventListener('url', ({ url }) => handleDeepLink(url));
+    return () => sub.remove();
+  }, []);
+
+  function handleDeepLink(url: string) {
+    const parsed = Linking.parse(url);
+
+    // NEVER trust deep link params for authorization
+    // Always verify server-side before showing sensitive data
+    switch (parsed.path) {
+      case 'claims/:id':
+        // Navigate to claim — screen will verify access via API
+        navigation.navigate('ClaimDetail', { claimId: parsed.queryParams?.id });
+        break;
+      case 'payments/confirm':
+        // Verify payment status server-side, don't trust link params
+        navigation.navigate('PaymentConfirm', { paymentId: parsed.queryParams?.id });
+        break;
+      default:
+        navigation.navigate('Home');
+    }
+  }
+}
+```
+

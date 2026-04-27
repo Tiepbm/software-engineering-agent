@@ -151,3 +151,173 @@ Reliability requires global `ErrorHandler` for uncaught errors, retry discipline
 - **Bundle bloat from Angular Material**: importing entire modules instead of standalone-component imports inflates bundle 100KB+ unnecessarily.
 - **Zoneless mode** (Angular 18+ preview): breaks libraries that rely on `Zone.js` patching (e.g., some RxJS schedulers, third-party widgets) — verify compatibility before enabling.
 
+## Code Examples
+
+### Functional Interceptor (Auth + Correlation + Error Mapping)
+
+```typescript
+// interceptors/auth-correlation.interceptor.ts
+export const authCorrelationInterceptor: HttpInterceptorFn = (req, next) => {
+  const auth = inject(AuthService);
+  const correlationId = crypto.randomUUID();
+
+  const authReq = req.clone({
+    setHeaders: {
+      'Authorization': `Bearer ${auth.accessToken()}`,
+      'X-Correlation-Id': correlationId,
+      'X-Tenant-Id': auth.tenantId(),
+    },
+  });
+
+  return next(authReq).pipe(
+    catchError((error: HttpErrorResponse) => {
+      if (error.status === 401) {
+        return auth.refreshToken$().pipe(
+          switchMap(() => next(authReq.clone({
+            setHeaders: { 'Authorization': `Bearer ${auth.accessToken()}` }
+          }))),
+        );
+      }
+      if (error.status === 429) {
+        const retryAfter = parseInt(error.headers.get('Retry-After') ?? '5', 10);
+        return timer(retryAfter * 1000).pipe(switchMap(() => next(authReq)));
+      }
+      return throwError(() => mapToAppError(error, correlationId));
+    }),
+  );
+};
+
+// Register in app.config.ts
+provideHttpClient(withInterceptors([authCorrelationInterceptor]))
+```
+
+### ExhaustMap for Idempotent Submit
+
+```typescript
+// components/payment-form.component.ts
+@Component({
+  template: `
+    <form [formGroup]="form" (ngSubmit)="submit$.next()">
+      <!-- form fields -->
+      <button type="submit" [disabled]="submitting()">
+        @if (submitting()) { Processing... } @else { Submit Payment }
+      </button>
+    </form>
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class PaymentFormComponent {
+  private http = inject(HttpClient);
+  private idempotencyKey = crypto.randomUUID(); // stable per component instance
+
+  form = new FormGroup({ amount: new FormControl(0, [Validators.required, Validators.min(1)]) });
+  submit$ = new Subject<void>();
+  submitting = signal(false);
+
+  constructor() {
+    this.submit$.pipe(
+      filter(() => this.form.valid),
+      tap(() => this.submitting.set(true)),
+      exhaustMap(() => this.http.post('/v1/payments', this.form.value, {
+        headers: { 'Idempotency-Key': this.idempotencyKey }
+      })),
+      takeUntilDestroyed(),
+    ).subscribe({
+      next: () => { this.submitting.set(false); /* navigate to success */ },
+      error: (err) => { this.submitting.set(false); /* show error */ },
+    });
+  }
+}
+```
+
+### Signal-Based Feature Service
+
+```typescript
+// services/claims.service.ts
+@Injectable({ providedIn: 'root' })
+export class ClaimsService {
+  private http = inject(HttpClient);
+
+  // State as signals
+  private _claims = signal<Claim[]>([]);
+  private _loading = signal(false);
+  private _error = signal<AppError | null>(null);
+
+  // Public read-only signals
+  readonly claims = this._claims.asReadonly();
+  readonly loading = this._loading.asReadonly();
+  readonly error = this._error.asReadonly();
+
+  // Derived
+  readonly openClaims = computed(() => this._claims().filter(c => c.status === 'OPEN'));
+  readonly claimCount = computed(() => this._claims().length);
+
+  loadClaims(filters: ClaimFilters): void {
+    this._loading.set(true);
+    this._error.set(null);
+
+    this.http.get<Claim[]>('/v1/claims', { params: filters as any }).pipe(
+      finalize(() => this._loading.set(false)),
+    ).subscribe({
+      next: (claims) => this._claims.set(claims),
+      error: (err) => this._error.set(mapToAppError(err)),
+    });
+  }
+}
+
+// Usage in component — no subscription management needed
+@Component({
+  template: `
+    @if (claims.loading()) { <spinner /> }
+    @else if (claims.error(); as err) { <error-message [error]="err" /> }
+    @else {
+      @for (claim of claims.openClaims(); track claim.id) {
+        <claim-card [claim]="claim" />
+      }
+    }
+  `
+})
+export class ClaimListComponent {
+  claims = inject(ClaimsService);
+  constructor() { this.claims.loadClaims({ status: 'OPEN' }); }
+}
+```
+
+### Typed Reactive Form with Cross-Field Validation
+
+```typescript
+interface EndorsementForm {
+  endorsementType: FormControl<string>;
+  effectiveDate: FormControl<string>;
+  changes: FormGroup<{ vehiclePlate: FormControl<string>; newValue: FormControl<string> }>;
+  reason: FormControl<string>;
+}
+
+@Component({ /* ... */ })
+export class EndorsementFormComponent {
+  form = new FormGroup<EndorsementForm>({
+    endorsementType: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    effectiveDate: new FormControl('', { nonNullable: true, validators: [Validators.required, this.futureDateValidator] }),
+    changes: new FormGroup({
+      vehiclePlate: new FormControl('', { nonNullable: true }),
+      newValue: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    }),
+    reason: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(10)] }),
+  }, { validators: [this.effectiveDateAfterTodayValidator] });
+
+  private futureDateValidator(control: AbstractControl): ValidationErrors | null {
+    const date = new Date(control.value);
+    return date > new Date() ? null : { futureDate: true };
+  }
+
+  private effectiveDateAfterTodayValidator(group: AbstractControl): ValidationErrors | null {
+    const type = group.get('endorsementType')?.value;
+    const date = group.get('effectiveDate')?.value;
+    if (type === 'CANCELLATION' && new Date(date) < new Date()) {
+      return { cancellationMustBeFuture: true };
+    }
+    return null;
+  }
+}
+```
+
