@@ -6,7 +6,8 @@
 
 Đây là agent kỹ thuật ở cấp principal dành cho hệ thống enterprise và regulated, với phạm vi mạnh về architecture, data, platform, security, observability, integration, delivery và production operations.
 
-- Tệp agent: `agents/ce7-software-engineering.agent.md`
+- Target Copilot chính: `.github/copilot-instructions.md` và `.github/skills/`
+- Tệp agent: `agents/ce7-software-engineering.agent.md`, `agents/skill-evaluator.agent.md`
 - Mốc đánh giá: `REVIEW.md`
 - Quy tắc bảo trì:
   - `instructions/principal-agent-maintenance.instructions.md`
@@ -46,16 +47,47 @@ gh repo edit <owner>/<repo> --add-topic copilot-agent --add-topic github-copilot
 ## Cấu trúc package
 
 ```text
-ce7-software-engineering/
+software-engineering-agent/
+  .github/
+    copilot-instructions.md
+    agents/
+      ce7-software-engineering.agent.md
+      skill-evaluator.agent.md
+    skills/
+      <7 pack skills>/SKILL.md
+      <7 pack skills>/references/*.md
   agents/
     ce7-software-engineering.agent.md
+    skill-evaluator.agent.md
   skills/
-    <33 domain skills>
+    <7 pack skills>/SKILL.md
+    <7 pack skills>/references/*.md
+  evals/
+    routing-benchmark.jsonl
+  docs/
+    external-skill-research.md
+    evaluation-improvement-playbook.vi-VN.md
+    skill-pack-quality-rubric.md
+  reports/
+    latest-skill-eval.md
+    skill-eval-history.jsonl
+  scripts/
+    validate_hybrid_packs.py
   instructions/
     principal-agent-maintenance.instructions.md
     principal-skills-maintenance.instructions.md
   REVIEW.md
 ```
+
+### Thiết kế hybrid skill pack ưu tiên Copilot
+
+- Chỉ có **7 peer pack skills** cho GitHub Copilot.
+- **33 leaf skills** trước đây được giữ dưới dạng `references/*.md` trong pack phù hợp.
+- Copilot nên load pack trước, sau đó chỉ load reference chính xác cần cho task.
+- `.github/skills/` là target runtime chính; `skills/` ở root mirror cùng cấu trúc để bảo trì repository.
+- `docs/external-skill-research.md` ghi lại các pattern đã tham khảo từ project khác trong workspace.
+- `docs/skill-pack-quality-rubric.md` chuyển các pattern đó thành quality gates có thể review.
+- `docs/evaluation-improvement-playbook.vi-VN.md` hướng dẫn vòng đánh giá và cải tiến agent/skills.
 
 ## Mục tiêu tối ưu
 
@@ -70,21 +102,24 @@ Với yêu cầu không tầm thường, agent thực hiện triage 6 bước b�
 
 ## Cài đặt và thiết lập
 
-Gói này theo hướng tài liệu + file markdown. Dựa trên cấu trúc hiện tại (`agents/`, `skills/`, `instructions/`), bạn có thể cài đặt nhanh như sau.
+Gói này theo hướng tài liệu + file markdown. Dựa trên cấu trúc hiện tại (`.github/`, `agents/`, `skills/`, `instructions/`), bạn có thể cài đặt nhanh như sau.
 
 ### 1) Clone repository
 
 ```bash
 git clone <your-repo-url>
-cd ce7-software-engineering
+cd software-engineering-agent
 ```
 
 ### 2) Giữ nguyên cấu trúc package
 
 Các đường dẫn bắt buộc:
 
+- `.github/copilot-instructions.md`
+- `.github/skills/<pack-name>/SKILL.md` (7 pack skills)
+- `.github/skills/<pack-name>/references/<leaf>.md` (33 leaf references)
 - `agents/ce7-software-engineering.agent.md`
-- `skills/<skill-name>/SKILL.md` (33 skills)
+- `agents/skill-evaluator.agent.md`
 - `instructions/principal-agent-maintenance.instructions.md`
 - `instructions/principal-skills-maintenance.instructions.md`
 
@@ -102,46 +137,46 @@ Ví dụ:
 ### 5) Kiểm tra sau khi cập nhật
 
 - Đảm bảo `README.md` và `README.vi-VN.md` còn đồng bộ.
-- Đảm bảo link trong bảng skills vẫn trỏ đúng `skills/<skill>/SKILL.md`.
+- Đảm bảo link pack vẫn trỏ đúng `skills/<pack>/SKILL.md` và `.github/skills/<pack>/SKILL.md`.
+- Cập nhật `docs/external-skill-research.md` khi áp dụng pattern mới từ project khác.
+- Review `docs/skill-pack-quality-rubric.md` khi đổi trigger, reference hoặc evaluator rules.
+- Chạy `python3 scripts/validate_hybrid_packs.py`.
 - Cập nhật `REVIEW.md` sau các thay đổi lớn.
 
-## Bảng mapping đầy đủ 33 skills
+## Mapping hybrid pack
 
-| # | Skill slug | Nhóm | Khi nào dùng | Tác nhân kích hoạt chính | Skill file |
-|---:|---|---|---|---|---|
-| 1 | `requirements-analysis` | Core Engineering | Làm rõ yêu cầu mơ hồ, acceptance criteria, scope/risk | Ambiguous scope, actors, workflows, measurable outcomes | [SKILL.md](skills/requirements-analysis/SKILL.md) |
-| 2 | `solution-architecture` | Core Engineering | Chọn hình dáng kiến trúc, buy-vs-build, ownership | Architecture shape, boundaries, complexity, team fit | [SKILL.md](skills/solution-architecture/SKILL.md) |
-| 3 | `system-design` | Core Engineering | Thiết kế runtime flow, component boundaries, failure modes | Runtime flows, sync/async, scalability, bottlenecks | [SKILL.md](skills/system-design/SKILL.md) |
-| 4 | `api-design` | Core Engineering | Thiết kế contract API, versioning, idempotency, errors | API boundaries, request/response contracts, compatibility | [SKILL.md](skills/api-design/SKILL.md) |
-| 5 | `testing-strategy` | Core Engineering | Xây dựng chiến lược test theo rủi ro, test pyramid, migration tests | Risk-based testing, integration/contract/E2E scope | [SKILL.md](skills/testing-strategy/SKILL.md) |
-| 6 | `code-review-and-refactoring` | Core Engineering | Review maintainability và kế hoạch refactor an toàn | Coupling/cohesion, debt, regression risk, safe sequence | [SKILL.md](skills/code-review-and-refactoring/SKILL.md) |
-| 7 | `data-modeling` | Data and Database | Mô hình hóa entity/aggregate, history, auditability | Entities, relationships, transactional boundaries | [SKILL.md](skills/data-modeling/SKILL.md) |
-| 8 | `database-architecture` | Data and Database | Chọn loại database theo workload-fit | OLTP/OLAP fit, consistency, scaling, retention | [SKILL.md](skills/database-architecture/SKILL.md) |
-| 9 | `sql-and-query-optimization` | Data and Database | Tối ưu SQL/ORM dựa trên execution plan | Query plans, indexes, joins, lock/contention | [SKILL.md](skills/sql-and-query-optimization/SKILL.md) |
-| 10 | `database-reliability-and-operations` | Data and Database | Vận hành database production: backup/restore/failover/migration | Replication, restore drills, migration safety | [SKILL.md](skills/database-reliability-and-operations/SKILL.md) |
-| 11 | `data-engineering-and-pipelines` | Data and Database | Thiết kế ETL/ELT/CDC, replay, backfill, data quality | Pipelines, schema evolution, idempotency, recovery | [SKILL.md](skills/data-engineering-and-pipelines/SKILL.md) |
-| 12 | `analytics-and-warehouse-design` | Data and Database | Thiết kế DWH/lakehouse, marts, semantic layer, governance | Dimensional models, BI consumption, freshness/cost | [SKILL.md](skills/analytics-and-warehouse-design/SKILL.md) |
-| 13 | `search-and-indexing` | Data and Database | Thiết kế search/indexing, relevance, reindex, auth filtering | Index sync, relevance tuning, eventual consistency | [SKILL.md](skills/search-and-indexing/SKILL.md) |
-| 14 | `security-review` | Security and Access | Đánh giá attack surface và abuse paths | Authz gaps, validation, secrets, dependency risk | [SKILL.md](skills/security-review/SKILL.md) |
-| 15 | `authn-authz-and-secrets` | Security and Access | Thiết kế authn/authz, identity propagation, secret rotation | Identity, RBAC/ABAC, least privilege, secret lifecycle | [SKILL.md](skills/authn-authz-and-secrets/SKILL.md) |
-| 16 | `messaging-and-eventing` | Messaging and Platform | Thiết kế queue/topic/event, ordering, DLQ, replay | Events, pub/sub, outbox/inbox, idempotent consumers | [SKILL.md](skills/messaging-and-eventing/SKILL.md) |
-| 17 | `api-gateway-and-service-integration` | Messaging and Platform | Thiết kế gateway/BFF, routing policy, service integration | API gateway, protocol translation, auth propagation | [SKILL.md](skills/api-gateway-and-service-integration/SKILL.md) |
-| 18 | `rate-limiting-and-traffic-control` | Messaging and Platform | Thiết kế throttling, quota, fairness, abuse prevention | Rate limiting, backpressure, graceful rejection | [SKILL.md](skills/rate-limiting-and-traffic-control/SKILL.md) |
-| 19 | `workflow-and-job-orchestration` | Messaging and Platform | Orchestrate workflow dài hạn, saga, compensation | Workflow state, approvals, compensation, resumability | [SKILL.md](skills/workflow-and-job-orchestration/SKILL.md) |
-| 20 | `background-jobs-and-batch-processing` | Messaging and Platform | Thiết kế job schedule/batch có checkpoint và retry | Chunking, retries, duplicate prevention, observability | [SKILL.md](skills/background-jobs-and-batch-processing/SKILL.md) |
-| 21 | `resilience-and-fault-tolerance` | Resilience and Performance | Áp dụng timeouts/retries/circuit breakers/degradation | Failure containment, failover, recovery patterns | [SKILL.md](skills/resilience-and-fault-tolerance/SKILL.md) |
-| 22 | `caching-and-distributed-state` | Resilience and Performance | Thiết kế cache correctness, TTL, invalidation, distributed locks | Staleness rules, key scope, stampede controls | [SKILL.md](skills/caching-and-distributed-state/SKILL.md) |
-| 23 | `performance-engineering` | Resilience and Performance | Cải thiện latency/throughput dựa trên profiling evidence | Profiling, capacity, concurrency, cost-aware tuning | [SKILL.md](skills/performance-engineering/SKILL.md) |
-| 24 | `logging-metrics-and-tracing` | Observability and Ops | Thiết kế telemetry có cấu trúc và redaction | Structured logs, metrics, traces, correlation IDs | [SKILL.md](skills/logging-metrics-and-tracing/SKILL.md) |
-| 25 | `monitoring-alerting-and-slos` | Observability and Ops | Thiết kế SLI/SLO, alert actionable, runbook ownership | Alert quality, burn rates, error budgets | [SKILL.md](skills/monitoring-alerting-and-slos/SKILL.md) |
-| 26 | `observability-and-sre` | Observability and Ops | Bảo đảm production readiness và operational ownership | Supportability, runbooks, game-day readiness | [SKILL.md](skills/observability-and-sre/SKILL.md) |
-| 27 | `devops-and-release` | Observability and Ops | Thiết kế CI/CD, rollout, feature flags, rollback safety | Release orchestration, migration coordination | [SKILL.md](skills/devops-and-release/SKILL.md) |
-| 28 | `file-and-object-storage` | Storage and Search | Thiết kế lưu trữ file/object, signed URL, retention, scanning | Upload/download flows, metadata, legal hold | [SKILL.md](skills/file-and-object-storage/SKILL.md) |
-| 29 | `dotnet-development` | Stack Specific | Hướng dẫn triển khai ASP.NET Core/EF Core production | Layering, middleware, async/cancellation, DTOs | [SKILL.md](skills/dotnet-development/SKILL.md) |
-| 30 | `java-spring-boot-development` | Stack Specific | Hướng dẫn triển khai Spring Boot service architecture | Controllers/services/repos, JPA, transactions | [SKILL.md](skills/java-spring-boot-development/SKILL.md) |
-| 31 | `reactjs-development` | Stack Specific | Hướng dẫn triển khai React web app architecture | Components/hooks/state/forms/API integration | [SKILL.md](skills/reactjs-development/SKILL.md) |
-| 32 | `angular-development` | Stack Specific | Hướng dẫn Angular structure, RxJS, forms, guards | Feature modules, services, interceptors, testability | [SKILL.md](skills/angular-development/SKILL.md) |
-| 33 | `react-native-development` | Stack Specific | Hướng dẫn mobile RN iOS/Android production | Navigation, permissions, offline, performance | [SKILL.md](skills/react-native-development/SKILL.md) |
+| # | Pack skill | Leaf references cũ | Trigger chính |
+|---:|---|---|---|
+| 1 | `core-engineering-pack` | `requirements-analysis`, `solution-architecture`, `system-design`, `api-design`, `testing-strategy`, `code-review-and-refactoring` | Requirements, architecture, APIs, tests, review, refactoring |
+| 2 | `data-database-analytics-pack` | `data-modeling`, `database-architecture`, `sql-and-query-optimization`, `database-reliability-and-operations`, `data-engineering-and-pipelines`, `analytics-and-warehouse-design` | Data models, databases, SQL/ORM, DB ops, pipelines, analytics |
+| 3 | `security-access-pack` | `security-review`, `authn-authz-and-secrets` | Security review, identity, authorization, tenant isolation, secrets, sensitive data |
+| 4 | `platform-integration-pack` | `messaging-and-eventing`, `api-gateway-and-service-integration`, `rate-limiting-and-traffic-control`, `workflow-and-job-orchestration`, `background-jobs-and-batch-processing` | Messaging, gateways, integrations, rate limits, workflows, jobs, batch |
+| 5 | `resilience-performance-pack` | `resilience-and-fault-tolerance`, `caching-and-distributed-state`, `performance-engineering` | Resilience, caching, distributed state, latency, throughput, profiling |
+| 6 | `observability-release-pack` | `logging-metrics-and-tracing`, `monitoring-alerting-and-slos`, `observability-and-sre`, `devops-and-release` | Telemetry, SLOs, alerts, runbooks, release, rollout, rollback |
+| 7 | `storage-search-stack-pack` | `file-and-object-storage`, `search-and-indexing`, `dotnet-development`, `java-spring-boot-development`, `reactjs-development`, `angular-development`, `react-native-development` | Object storage, search, .NET, Spring Boot, React, Angular, React Native |
+
+### Validation
+
+```bash
+python3 scripts/validate_hybrid_packs.py
+```
+
+Validator kiểm tra đúng 7 peer pack skills, 33 references, 2 agents, chưa có deferred reviewer agents, route Copilot đầy đủ và corpus benchmark hợp lệ.
+
+## Bước tiếp theo để đánh giá và cải tiến
+
+1. Đọc `docs/evaluation-improvement-playbook.vi-VN.md` để hiểu workflow đánh giá 5 lớp.
+2. Chạy structural validation:
+
+   ```bash
+   python3 scripts/validate_hybrid_packs.py
+   ```
+
+3. Chọn 5–10 prompts từ `evals/routing-benchmark.jsonl`.
+4. Chạy các prompt đó với `ce7-software-engineering` và ghi lại pack/reference được kích hoạt.
+5. Dùng `agents/skill-evaluator.agent.md` để chấm output theo `evals/scoring-rubric.md`.
+6. Ghi kết quả vào `reports/latest-skill-eval.md` và thêm dòng lịch sử vào `reports/skill-eval-history.jsonl`.
+7. Chỉ patch pack/reference khi benchmark chỉ ra lỗi cụ thể về routing, reference precision, output quality hoặc token bloat.
 
 ## Định dạng output mặc định
 

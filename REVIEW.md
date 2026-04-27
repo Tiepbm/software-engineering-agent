@@ -1,8 +1,10 @@
 # Quality Review — Principal Software Engineering Copilot Package
 
-**Review date**: 2026-04-25  
-**Scope**: 1 agent + 33 skills + 2 maintenance instruction files in `principal-software-engineering-copilot-package/`.  
-**Status**: Post P1 + P2 + P3 patches.
+**Review date**: 2026-04-26  
+**Scope**: Copilot-first hybrid package with 2 agents + 7 pack skills + 33 references + eval harness.  
+**Status**: Post hybrid-pack migration.
+
+> Migration note: the previous 33 peer skills are no longer peers. They are preserved as `references/*.md` under 7 pack skills and mirrored into `.github/skills/` for GitHub Copilot. Use `python3 scripts/validate_hybrid_packs.py` as the current structural quality gate.
 
 This report replaces the older pre-patch review. The previous findings about thin stack skills, missing few-shot examples, and observability overlap have been rechecked against the current package.
 
@@ -12,21 +14,26 @@ This report replaces the older pre-patch review. The previous findings about thi
 
 | Category | Result |
 |---|---|
-| Package contents | 1 agent, 33 skills, 2 instruction files |
-| Skill frontmatter compliance | ✅ 33/33 pass |
-| Skill section structure | ✅ 33/33 keep the required section order |
-| Skill line-count floor | ✅ 33/33 pass; `observability-and-sre` is an intentional delegation skill |
-| Stack skill depth | ✅ 5/5 stack skills now exceed the 130-line floor |
-| Agent routing | ✅ Routes to all 33 skills |
+| Package contents | 2 agents, 7 pack skills, 33 references, 2 instruction files, Copilot `.github/` target, eval harness |
+| Pack frontmatter compliance | ✅ 7/7 pack skills use trigger-first frontmatter |
+| Reference preservation | ✅ 33/33 former leaf skills preserved under pack `references/` |
+| Copilot target | ✅ `.github/copilot-instructions.md`, `.github/agents/`, and `.github/skills/` created |
+| Agent routing | ✅ Routes pack-first, then leaf references only when needed |
 | Agent few-shot example | ✅ Present: architecture-task example for payment idempotency |
-| Agent duplication risk | ✅ Reduced: cross-cutting platform detail is mostly routing table + minimum bars |
-| Overall score | **9.2 / 10** |
+| Agent duplication risk | ✅ Reduced: pack skills own routing; leaf detail lives in references |
+| Structural validator | ✅ `scripts/validate_hybrid_packs.py` added and now checks research/rubric artifacts |
+| External skill research | ✅ `docs/external-skill-research.md` records sibling-project patterns and originality notes |
+| Pack quality rubric | ✅ `docs/skill-pack-quality-rubric.md` defines trigger, reference, token, benchmark, security, release, and Copilot readiness gates |
+| Evaluation workflow | ✅ `docs/evaluation-improvement-playbook.vi-VN.md`, `evals/scoring-rubric.md`, and `reports/` templates added |
+| Overall score | **Pending re-benchmark** |
 
-**Verdict**: The package is now principal-grade and suitable for enterprise / regulated software-engineering guidance. It is strongest in data/database, platform, security, release safety, performance, and modern stack-specific guidance. No P0 or P1 blockers remain.
+**Verdict**: The package is now structurally aligned with the Copilot-first hybrid-pack design. Re-score quality after running the new benchmark corpus through `skill-evaluator`.
 
 ---
 
 ## 2. Validation Snapshot
+
+Current structural validation is owned by `scripts/validate_hybrid_packs.py`. The detailed line-count table below is retained as the historical pre-migration baseline for the former leaf skills, which now live under pack `references/`.
 
 Line counts were checked directly from the current files.
 
@@ -116,18 +123,18 @@ Line counts were checked directly from the current files.
 - ✅ Clear principal-level identity: behaves like a panel of senior specialists, not a generic assistant.
 - ✅ Strong enterprise and regulated-system posture: data correctness, auditability, resource-level authorization, idempotency, migrations, observability, operational controls.
 - ✅ Mandatory request triage forces the agent to classify role, supporting lenses, task type, risk, sensitivity, and missing constraints.
-- ✅ Skill routing covers all 33 skills and groups them logically.
+- ✅ Skill routing now covers all 7 packs and names leaf references only when precision is needed.
 - ✅ `Cross-Cutting Platform Routing` now routes to specialist skills instead of repeating full platform guidance.
 - ✅ Few-shot example for payment idempotency gives a concrete output shape: decision, skills consulted, assumptions, contract, rejected alternatives, tests, operational signals, open questions.
 - ✅ Production stop conditions are explicit and useful for high-risk recommendations.
 
 ### Remaining minor weakness
 
-- ⚠️ The `Mission` list is still mostly domain labels rather than direct `→ skill-name` references. This is not blocking because the dedicated `Skill Routing` section is complete, but adding references would improve scanability.
+- ⚠️ The `Mission` list is still mostly domain labels rather than direct `→ pack-name` references. This is not blocking because the dedicated `Skill Routing` section is complete, but adding pack references would improve scanability.
 
 ### Recommendation
 
-No urgent change required. Optional future polish: add `→ skill-name` references to the mission bullets or shorten the mission list by pointing readers to `Skill Routing`.
+No urgent change required. Optional future polish: add `→ pack-name` references to the mission bullets or shorten the mission list by pointing readers to `Skill Routing`.
 
 ---
 
@@ -262,7 +269,7 @@ These are not blockers; they would make the package easier to evolve and test ov
    - `incident-response-and-postmortem`;
    - `architecture-decision-records`;
    - `cost-and-finops`.
-5. Optional polish: add `→ skill-name` references to the agent `Mission` bullets.
+5. Optional polish: add `→ pack-name` references to the agent `Mission` bullets.
 
 ---
 

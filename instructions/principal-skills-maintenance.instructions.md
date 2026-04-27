@@ -6,20 +6,22 @@ applyTo: 'skills/**/SKILL.md'
 
 ## Purpose
 
-Use these instructions when editing or adding `skills/<skill-name>/SKILL.md` files in this package. Each skill must remain a focused expert playbook with concrete production guidance, not a generic best-practices article.
+Use these instructions when editing or adding `skills/<pack-name>/SKILL.md` files in this package. Each top-level skill is now a **hybrid pack skill**: a focused routing and synthesis layer with detailed former leaf skills stored under `references/*.md`.
 
 ## Package Boundary
 
 - Keep these skills in this standalone package unless the user explicitly asks to contribute to another repository.
 - Do not place generated skills back into `awesome-copilot` by default.
-- Preserve the path convention: `skills/<skill-name>/SKILL.md`.
+- Preserve the path convention: `skills/<pack-name>/SKILL.md` plus `skills/<pack-name>/references/<leaf-skill>.md`.
+- Keep `.github/skills/` as the primary GitHub Copilot output mirror.
+- When adopting patterns from sibling workspace projects, update `docs/external-skill-research.md` and apply `docs/skill-pack-quality-rubric.md`. Do not copy external skill text verbatim.
 
 ## Required Skill Frontmatter
 
 Every `SKILL.md` must start with markdown frontmatter:
 
-- `name`: lowercase, hyphen-separated, and exactly matching the folder name.
-- `description`: concise, non-empty, wrapped in single quotes, and between 10 and 1024 characters.
+- `name`: lowercase, hyphen-separated, and exactly matching the pack folder name.
+- `description`: concise, non-empty, wrapped in single quotes, between 10 and 1024 characters, and beginning with trigger-style `Use when` wording.
 
 Example:
 
@@ -30,24 +32,22 @@ description: 'Clear description of the focused skill purpose.'
 ---
 ```
 
-## Required Section Order
+## Pack Skill Structure
 
-Every skill must keep these sections in this order:
+Every top-level pack `SKILL.md` must keep these sections in this order:
 
 1. Title
 2. Description
 3. Purpose
 4. When to Use
-5. Responsibilities
-6. Decision Principles
-7. Expected Output Style
-8. Architecture / Design Guidance
-9. Implementation Guidance
-10. Testing Expectations
-11. Security / Performance / Reliability Considerations
-12. Review Checklist
-13. Anti-Patterns to Avoid
-14. Gotchas / Common Failure Modes
+5. Pack Reference Map
+6. Routing Rules
+7. Reference Selection Matrix
+8. Expected Output Style
+9. Token Efficiency Rules
+10. Quality Gates
+
+Former leaf references under `references/*.md` may retain their previous detailed 14-section playbook structure. Do not force leaf references into the short pack structure.
 
 ### Optional Trailing Sections
 
@@ -61,7 +61,7 @@ Subsections (`###`) inside a required section are allowed and encouraged for dec
 
 ## Skill Quality Bar
 
-Each skill must be written like a senior/principal engineer playbook:
+Each pack must be written like a senior/principal routing layer:
 
 - Use concrete, enforceable rules.
 - Explain trade-offs and rejected shortcuts.
@@ -70,12 +70,14 @@ Each skill must be written like a senior/principal engineer playbook:
 - Include test expectations and review checklists that a team can apply during PR review.
 - Avoid vague phrases such as “follow best practices” unless followed by specific verification rules.
 - Keep guidance useful for enterprise systems, especially banking, insurance, transaction-heavy, regulated, and audit-heavy workloads.
+- Keep detailed domain instruction in `references/*.md`; the pack owns discovery, routing, and synthesis.
 
-### Minimum Depth Floor
+### Pack Size and Reference Rules
 
-- Stack-specific skills (`*-development`: dotnet, java-spring-boot, reactjs, angular, react-native) must be **≥ 130 lines**. Below this floor a stack skill cannot reliably cover framework version, ecosystem libraries, decision matrices, and gotchas at principal grade.
-- All other skills must be **≥ 90 lines**, unless explicitly marked as a delegation skill (see Focus and Boundary Rules).
-- Length is a sanity floor, not a target — bloat is still rejected by the Anti-Patterns rules. Prefer adding a worked example or decision matrix over restating prose.
+- Top-level pack skills should normally stay **≤ 220 lines**. If a pack grows beyond this, move detail into `references/`.
+- The package must expose exactly **7 peer pack skills** in both `skills/` and `.github/skills/`.
+- The package must preserve exactly **33 former leaf references** across pack `references/` directories unless a deliberate migration updates `scripts/validate_hybrid_packs.py` and `evals/routing-benchmark.jsonl`.
+- Former stack-specific references (`*-development`) should retain their detailed implementation depth inside `references/`, not as peer skills.
 
 ### Decision Matrix Preference
 
@@ -83,21 +85,15 @@ When a skill describes choices among multiple options (algorithm, model, framewo
 
 ## Focus and Boundary Rules
 
-Do not turn every skill into a giant platform document. Keep the skill’s original purpose and route deeper concerns to related skills:
+Do not turn every pack into a giant platform document. Keep packs as routing and synthesis layers, then route deeper concerns to references:
 
-- Use `security-review` for attack surfaces, sensitive data, dependency risk, and abuse cases.
-- Use `authn-authz-and-secrets` for identity, resource authorization, tenant isolation, secrets, and credential rotation.
-- Use `messaging-and-eventing` for queues, topics, events, ordering, idempotency, retries, DLQs, replay, and consumer operations.
-- Use `caching-and-distributed-state` for TTLs, invalidation, stale reads, distributed locks, sessions, and cache authorization safety.
-- Use `resilience-and-fault-tolerance` for timeouts, retries, circuit breakers, bulkheads, degradation, and failure containment.
-- Use `logging-metrics-and-tracing` for structured logs, metrics, traces, correlation IDs, redaction, and telemetry fields.
-- Use `monitoring-alerting-and-slos` for SLIs, SLOs, dashboards, alert thresholds, severity, ownership, and runbooks.
-- Use `background-jobs-and-batch-processing` for scheduled work, workers, chunking, checkpointing, duplicate prevention, and resumability.
-- Use `workflow-and-job-orchestration` for long-running workflows, state machines, approvals, compensation, and manual repair.
-- Use `api-gateway-and-service-integration` for gateways, BFFs, partner integration, auth propagation, transformation, and external dependency boundaries.
-- Use `file-and-object-storage` for uploads, downloads, signed URLs, retention, malware scanning, metadata, and large-file behavior.
-- Use `search-and-indexing` for search projections, relevance, filtering, authorization, reindexing, and source-of-truth synchronization.
-- Use `rate-limiting-and-traffic-control` for quotas, throttling, backpressure, priority traffic, partner protection, and graceful rejection.
+- Use `security-access-pack` references for attack surfaces, identity, resource authorization, tenant isolation, secrets, sensitive data, and abuse cases.
+- Use `platform-integration-pack` references for queues, topics, gateways, workflows, background jobs, rate limiting, retries, DLQs, replay, and consumer operations.
+- Use `resilience-performance-pack` references for TTLs, invalidation, stale reads, locks, timeouts, retries, circuit breakers, performance, and profiling.
+- Use `observability-release-pack` references for logs, metrics, traces, SLIs, SLOs, dashboards, alerts, runbooks, CI/CD, rollout, and release safety.
+- Use `storage-search-stack-pack` references for object storage, search projections, authorization filtering, reindexing, and stack-specific implementation.
+- Use `data-database-analytics-pack` references for data models, database decisions, SQL/ORM tuning, DB operations, pipelines, warehouses, and analytics.
+- Use `core-engineering-pack` references for requirements, architecture, system design, APIs, testing, review, and refactoring.
 
 ### Delegation Skills
 
@@ -143,15 +139,18 @@ Stack skills such as `.NET`, Spring Boot, React, Angular, and React Native must 
 
 ## Review Checklist
 
-Before finalizing a skill change, verify:
+Before finalizing a skill-pack change, verify:
 
 - The `name` field exactly matches the skill folder.
-- The `description` is clear and validation-friendly.
-- All required sections exist in the correct order.
-- Any optional trailing section (`See Also`, `Worked Example`, `<Name> Template`) appears only after the 14 required sections.
-- Stack skills meet the 130-line floor; other skills meet the 90-line floor (or are explicitly delegation skills).
+- The `description` is clear, validation-friendly, and starts with `Use when`.
+- All pack sections exist in the correct order.
+- Former leaf content lives under `references/`, not as a peer skill.
+- Root `skills/` and `.github/skills/` stay synchronized.
+- `scripts/validate_hybrid_packs.py` passes.
+- `docs/external-skill-research.md` records any newly adopted external pattern.
+- `docs/skill-pack-quality-rubric.md` still reflects the current quality gate.
 - Choice-among-options content uses a decision matrix, not prose.
-- The skill remains focused on its domain.
+- The pack remains focused on routing and synthesis.
 - Cross-cutting concerns are referenced only where they affect the skill’s domain.
 - Gotchas and anti-patterns are concrete enough to catch production defects.
 - Testing expectations include failure paths, not only happy paths.

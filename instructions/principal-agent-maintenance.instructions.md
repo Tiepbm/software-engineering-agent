@@ -6,13 +6,16 @@ applyTo: 'agents/**/*.agent.md'
 
 ## Purpose
 
-Use these instructions when editing or extending the Principal Software Engineering Agent in this package. The agent must remain a principal-level engineering panel that routes work to focused skills instead of becoming a generic all-purpose prompt.
+Use these instructions when editing or extending the Principal Software Engineering Agent in this package. The agent must remain a principal-level engineering panel that routes work to focused **pack skills** instead of becoming a generic all-purpose prompt.
 
 ## Package Boundary
 
 - Keep this package independent from `awesome-copilot` unless the user explicitly asks to contribute there.
 - Do not add generated agent or skill files back into `awesome-copilot` by default.
-- Preserve the local package structure: `agents/*.agent.md`, `skills/<skill-name>/SKILL.md`, and `instructions/*.instructions.md`.
+- Preserve the local package structure: `agents/*.agent.md`, `skills/<pack-name>/SKILL.md`, `skills/<pack-name>/references/<leaf>.md`, `.github/skills/<pack-name>/SKILL.md`, `.github/copilot-instructions.md`, and `instructions/*.instructions.md`.
+- Treat `.github/` as the primary GitHub Copilot output target in this phase.
+- Use `docs/external-skill-research.md` and `docs/skill-pack-quality-rubric.md` when changing routing behavior based on patterns from sibling workspace projects.
+- Do not copy external agent or skill text verbatim; adapt patterns into CE7-specific routing, evaluation, and production-safety rules.
 
 ## Agent Frontmatter Rules
 
@@ -34,25 +37,17 @@ The agent must always behave like a panel of senior specialists, not a generic c
 
 ## Skill Routing Rules
 
-When editing routing sections, keep each skill focused and route by responsibility:
+When editing routing sections, keep each pack focused and route by responsibility:
 
-- `requirements-analysis`: ambiguous scope, actors, workflows, acceptance criteria, business rules, measurable outcomes.
-- `solution-architecture`: architecture shape, buy/build, monolith vs modular monolith vs microservices, ownership, delivery complexity.
-- `system-design`: runtime flows, component boundaries, sync/async choices, bottlenecks, failure behavior.
-- `api-design`: request/response contracts, errors, pagination, filtering, idempotency, versioning, integration usability.
-- `data-modeling`: entities, aggregates, relationships, transactional boundaries, audit history, derived state.
-- `database-architecture`: database family selection, workload fit, canonical vs derived stores, indexing, partitioning, replication.
-- `data-engineering-and-pipelines`: ETL, ELT, CDC, streaming, batch, quality gates, replay, backfill, freshness.
-- `analytics-and-warehouse-design`: dimensional modeling, marts, semantic layers, BI, governance, cost controls.
-- `sql-and-query-optimization`: query plans, indexes, joins, pagination, locks, ORM-generated SQL.
-- `database-reliability-and-operations`: backup, restore, failover, migrations, connection pools, capacity, database runbooks.
-- `testing-strategy`: risk-based tests, contracts, integration, E2E, migration, security, observability, failure testing.
-- `security-review`: attack surfaces, authorization, validation, secrets, sensitive telemetry, dependency and abuse risk.
-- `performance-engineering`: latency, throughput, queue lag, cache hit rate, dependency budgets, profiling.
-- `devops-and-release`: CI/CD, rollout, feature flags, migrations, rollback/roll-forward, secret and platform changes.
-- `observability-and-sre`: production supportability, incident readiness, runbooks, dashboards, business workflow visibility.
-- `code-review-and-refactoring`: maintainability, coupling, cohesion, technical debt, regression risk, safe refactoring order.
-- Stack skills: route framework-specific implementation details to the relevant stack skill, and platform concerns to platform skills.
+- `core-engineering-pack`: requirements, architecture, system design, API contracts, testing, review, and refactoring.
+- `data-database-analytics-pack`: data modeling, database architecture, SQL/ORM optimization, DB operations, pipelines, analytics, and warehouses.
+- `security-access-pack`: security review, authentication, authorization, tenant isolation, identity propagation, secrets, sensitive telemetry, dependency and abuse risk.
+- `platform-integration-pack`: messaging, events, gateways, BFFs, service integration, rate limits, workflows, background jobs, and batch processing.
+- `resilience-performance-pack`: latency, throughput, profiling, caching, distributed state, timeouts, retries, circuit breakers, and failure containment.
+- `observability-release-pack`: structured telemetry, SLIs/SLOs, alerts, runbooks, production readiness, CI/CD, rollouts, migrations, feature flags, and rollback.
+- `storage-search-stack-pack`: file/object storage, search/indexing, and framework-specific implementation details for .NET, Spring Boot, React, Angular, and React Native.
+
+Leaf topics such as `api-design`, `security-review`, or `java-spring-boot-development` are now references under packs. Name them as `pack → reference` when precision matters, but do not treat them as peer skills.
 
 ## Cross-Cutting Platform Rules
 
@@ -81,7 +76,7 @@ The agent must keep at least one **worked example** demonstrating the target out
 
 - Turning the agent into a long tutorial instead of an operational decision guide.
 - Duplicating full skill content inside the agent instead of routing to skills.
-- **Skill duplication threshold**: if any block in the agent repeats more than ~5 lines of content that already exists in a single skill, cut the block and replace it with a one-line route (`→ see skill-name`). This applies especially to Cross-Cutting Platform Rules and Default Review Lenses, where it is tempting to inline detail that the skill already owns. The agent's job is routing and panel orchestration, not redelivering skill content.
+- **Skill duplication threshold**: if any block in the agent repeats more than ~5 lines of content that already exists in a pack or reference, cut the block and replace it with a one-line route (`→ see pack-name` or `→ see pack-name/reference-name`). This applies especially to Cross-Cutting Platform Rules and Default Review Lenses, where it is tempting to inline detail that the pack/reference already owns. The agent's job is routing and panel orchestration, not redelivering skill content.
 - Recommending asynchronous messaging without failure, ordering, idempotency, and operator repair rules.
 - Recommending caching without stale-read, invalidation, tenant isolation, and authorization rules.
 - Recommending monitoring without actionable signals, severity, ownership, and runbooks.
@@ -92,8 +87,11 @@ The agent must keep at least one **worked example** demonstrating the target out
 
 Before finalizing agent changes, verify:
 
-- The agent still routes to every skill that exists in this package.
-- No referenced skill name is missing or misspelled.
+- The agent still routes to all 7 pack skills that exist in this package.
+- Leaf references are named only as pack references, not as peer skills.
+- No referenced pack or reference name is missing or misspelled.
+- `.github/agents/` is synchronized with `agents/` when agent files change.
+- External pattern changes are reflected in `docs/external-skill-research.md` and evaluated against `docs/skill-pack-quality-rubric.md`.
 - The agent remains concise enough to guide behavior without burying the model in repeated content.
 - Enterprise, regulated, data, security, observability, messaging, caching, and release concerns are visible.
 - The agent does not assume files should be committed to `awesome-copilot`.

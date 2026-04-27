@@ -98,65 +98,43 @@ Proceed with explicit assumptions when the request is answerable. Pause for clar
 
 ## Skill Routing
 
-Route work to these skills when their triggers match.
+Route work to these **pack skills** when their triggers match. The former leaf skills now live as `references/*.md` inside each pack and should be loaded only when the subdomain materially affects the answer.
 
-### Core Engineering and Architecture Skills
+### Core Engineering and Architecture Pack
 
-- `requirements-analysis`: ambiguous requests, actors, workflows, business rules, constraints, acceptance criteria, measurable outcomes, edge cases.
-- `solution-architecture`: architecture shape, buy vs build, monolith vs modular monolith vs microservices, integration strategy, delivery complexity, team capability.
-- `system-design`: service boundaries, runtime flows, component decomposition, state ownership, sync vs async, scalability, resilience, bottlenecks, failure modes.
-- `api-design`: API boundaries, contracts, errors, pagination, filtering, sorting, idempotency, versioning, validation, backward compatibility.
-- `data-modeling`: entities, aggregates, relationships, transactional boundaries, normalization, history, auditability, reporting implications.
-- `testing-strategy`: test pyramid, unit tests, integration tests, contract tests, E2E tests, migration tests, test data, risk-based automation.
-- `code-review-and-refactoring`: maintainability, coupling, cohesion, hidden complexity, technical debt, regression risk, safe refactoring order.
+- `core-engineering-pack`: requirements, solution architecture, system design, API contracts, testing strategy, review, and refactoring.
+- Reference only when needed: `requirements-analysis`, `solution-architecture`, `system-design`, `api-design`, `testing-strategy`, `code-review-and-refactoring`.
 
-### Data, Database, and Analytics Skills
+### Data, Database, and Analytics Pack
 
-- `database-architecture`: database selection, workload fit, OLTP/OLAP, relational/document/key-value/wide-column/graph/time-series/search stores, indexing, partitioning, sharding, replication, retention.
-- `data-engineering-and-pipelines`: ETL, ELT, batch, streaming, CDC, event ingestion, schema evolution, data quality, idempotency, replay, backfill, recovery.
-- `analytics-and-warehouse-design`: facts, dimensions, star schemas, marts, semantic layers, warehouses, lakehouses, BI consumption, governance, cost controls.
-- `sql-and-query-optimization`: execution plans, indexes, joins, selectivity, aggregation, pagination, locks, ORM-generated SQL, write amplification.
-- `database-reliability-and-operations`: replication, failover, backup, restore, migrations, capacity, connection management, production database operations.
+- `data-database-analytics-pack`: data modeling, database architecture, SQL/query optimization, production database operations, pipelines, analytics, and warehouse design.
+- Reference only when needed: `data-modeling`, `database-architecture`, `sql-and-query-optimization`, `database-reliability-and-operations`, `data-engineering-and-pipelines`, `analytics-and-warehouse-design`.
 
-### Security and Access Skills
+### Security and Access Pack
 
-- `security-review`: application, API, data, dependency, mobile, web, and infrastructure security review.
-- `authn-authz-and-secrets`: authentication, authorization, identity propagation, tenant isolation, secrets management, credential rotation, audit controls.
-- `security-review` must be used for changes involving identity, permissions, PII, payment data, financial transactions, policy/claim/billing state, secrets, file upload, external callbacks, admin operations, or sensitive logging.
+- `security-access-pack`: security review, authentication, authorization, identity propagation, tenant isolation, secrets, dependency risk, sensitive data, and abuse cases.
+- Reference only when needed: `security-review`, `authn-authz-and-secrets`.
+- This pack must be considered for changes involving identity, permissions, PII, payment data, financial transactions, policy/claim/billing state, secrets, file upload, external callbacks, admin operations, or sensitive logging.
 
-### Messaging, Integration, and Platform Skills
+### Messaging, Integration, and Platform Pack
 
-- `messaging-and-eventing`: queues, topics, event streams, pub/sub, Kafka-style patterns, outbox, inbox, idempotent consumers, ordering, replay, DLQs.
-- `api-gateway-and-service-integration`: API gateways, BFFs, service-to-service integration, routing, policy enforcement, protocol translation, throttling, service aggregation.
-- `rate-limiting-and-traffic-control`: rate limits, quotas, throttling, load shedding, backpressure, fairness, abuse prevention, tenant protection.
-- `workflow-and-job-orchestration`: workflow engines, orchestrators, sagas, long-running business processes, compensation, state machines, job dependencies.
-- `background-jobs-and-batch-processing`: scheduled jobs, workers, batch processing, retries, concurrency limits, backfills, resumability, operational controls.
+- `platform-integration-pack`: messaging, eventing, gateways, BFFs, partner integrations, rate limiting, workflows, background jobs, and batch processing.
+- Reference only when needed: `messaging-and-eventing`, `api-gateway-and-service-integration`, `rate-limiting-and-traffic-control`, `workflow-and-job-orchestration`, `background-jobs-and-batch-processing`.
 
-### Resilience, State, and Performance Skills
+### Resilience, State, and Performance Pack
 
-- `resilience-and-fault-tolerance`: timeouts, retries, circuit breakers, bulkheads, failover, degradation, recovery, chaos/failure testing.
-- `caching-and-distributed-state`: caches, distributed locks, sessions, state stores, invalidation, staleness, consistency, stampede protection.
-- `performance-engineering`: latency, throughput, profiling, resource usage, database cost, network cost, rendering cost, concurrency, caching.
+- `resilience-performance-pack`: resilience, fault tolerance, caching, distributed state, and performance engineering.
+- Reference only when needed: `resilience-and-fault-tolerance`, `caching-and-distributed-state`, `performance-engineering`.
 
-### Observability and Operations Skills
+### Observability, Operations, and Release Pack
 
-- `logging-metrics-and-tracing`: structured logs, metrics, traces, correlation IDs, telemetry fields, cardinality, redaction, trace propagation.
-- `monitoring-alerting-and-slos`: SLIs, SLOs, alerting, dashboards, incident readiness, error budgets, actionable alerts, noise reduction.
-- `observability-and-sre`: production supportability, runbooks, incident response, dashboards, service health, operational readiness.
-- `devops-and-release`: CI/CD, environment promotion, configuration, feature flags, rollback, migration coordination, deployment risk reduction.
+- `observability-release-pack`: logs, metrics, traces, SLIs, SLOs, alerts, dashboards, runbooks, production readiness, CI/CD, rollouts, feature flags, rollback, and migration release safety.
+- Reference only when needed: `logging-metrics-and-tracing`, `monitoring-alerting-and-slos`, `observability-and-sre`, `devops-and-release`.
 
-### Storage, Search, and File Handling Skills
+### Storage, Search, and Stack Pack
 
-- `search-and-indexing`: search platforms, indexing pipelines, relevance, faceting, authorization filtering, reindexing, index freshness, search consistency.
-- `file-and-object-storage`: object storage, document storage, uploads, downloads, lifecycle policies, retention, encryption, malware scanning, metadata, large-file handling.
-
-### Stack-Specific Skills
-
-- `dotnet-development`: ASP.NET Core, dependency injection, middleware, EF Core, validation, async/cancellation, DTOs, exception handling, logging, testing.
-- `java-spring-boot-development`: Spring Boot REST, controller/service/repository layering, JPA, transactions, validation, security, DTO mapping, N+1 avoidance.
-- `reactjs-development`: React components, hooks, state, forms, API integration, loading/error/empty states, accessibility, performance.
-- `angular-development`: Angular feature structure, services, RxJS, reactive forms, guards, interceptors, state handling, testability.
-- `react-native-development`: mobile screens, navigation, iOS/Android differences, native modules, permissions, offline behavior, rendering performance, release diagnostics.
+- `storage-search-stack-pack`: file/object storage, search/indexing, and stack-specific implementation for .NET, Spring Boot, React, Angular, and React Native.
+- Reference only when needed: `file-and-object-storage`, `search-and-indexing`, `dotnet-development`, `java-spring-boot-development`, `reactjs-development`, `angular-development`, `react-native-development`.
 
 ## Default Review Lenses
 
@@ -180,30 +158,30 @@ Apply these lenses unless the task is intentionally narrow:
 
 When the request touches a cross-cutting concern, **route to the specialist skill instead of inlining the rules**. The non-negotiable rules above already enforce the minimum bar; the skill defines the design and verification detail.
 
-| Concern | Skill | Minimum bar (already in operating rules) |
+| Concern | Pack / reference | Minimum bar (already in operating rules) |
 |---|---|---|
-| Database / store selection | `database-architecture` | Workload-fit reasoning required (rule 7) |
-| Schema / lifecycle / history / derived state | `data-modeling` | Source of truth, derived state ownership |
-| SQL / ORM tuning | `sql-and-query-optimization` | Plan-based, not guess-based |
-| DB ops, migration, restore, failover | `database-reliability-and-operations` | Tested restore, expand-contract |
-| Pipelines, ETL/ELT/CDC, replay | `data-engineering-and-pipelines` | Idempotent sinks, replay/backfill design |
-| Warehouse, BI, marts, semantic layer | `analytics-and-warehouse-design` | Grain, lineage, governed metrics |
-| Messaging / events / outbox / DLQ | `messaging-and-eventing` | Ordering, idempotency, retry, DLQ, replay (rule 8) |
-| Caching / distributed state / locks | `caching-and-distributed-state` | Staleness, invalidation, authorization, stampede (rule 9) |
-| Resilience / timeouts / circuit / fallback | `resilience-and-fault-tolerance` | Timeouts everywhere, idempotency-aware retry |
-| Background jobs / batch / reconciliation | `background-jobs-and-batch-processing` | Idempotent, resumable, observable |
-| Long-running workflows / sagas | `workflow-and-job-orchestration` | Explicit state, compensation, manual repair |
-| API gateway / BFF / partner integration | `api-gateway-and-service-integration` | Auth propagation, error mapping, contract isolation |
-| Rate limit / throttling / backpressure | `rate-limiting-and-traffic-control` | Business-identity keying, fair degradation |
-| File / object storage / signed URLs | `file-and-object-storage` | Metadata outside object; scan; retention; legal hold |
-| Search / indexing / authorization filtering | `search-and-indexing` | Source of truth ≠ index; reindex strategy |
-| Auth / identity / secrets | `authn-authz-and-secrets` | Resource-level authz; secret rotation; audit |
-| Security review across surfaces | `security-review` | 4 paths (request/async/derived/operator) |
-| Logs / metrics / traces / cardinality | `logging-metrics-and-tracing` | Structured, redacted, propagated |
-| SLIs / SLOs / alerts / runbooks | `monitoring-alerting-and-slos` | Actionable, owned, runbook-linked (rule 10) |
-| Production readiness story / ownership | `observability-and-sre` | Owner per page; game-day tested |
-| CI/CD / canary / migrations / flags | `devops-and-release` | Tested rollback; expand-contract; SLO gates (rule 12) |
-| Latency / throughput / profiling | `performance-engineering` | Profile before optimize; bounded concurrency |
+| Database / store selection | `data-database-analytics-pack` → `database-architecture` | Workload-fit reasoning required (rule 7) |
+| Schema / lifecycle / history / derived state | `data-database-analytics-pack` → `data-modeling` | Source of truth, derived state ownership |
+| SQL / ORM tuning | `data-database-analytics-pack` → `sql-and-query-optimization` | Plan-based, not guess-based |
+| DB ops, migration, restore, failover | `data-database-analytics-pack` → `database-reliability-and-operations` | Tested restore, expand-contract |
+| Pipelines, ETL/ELT/CDC, replay | `data-database-analytics-pack` → `data-engineering-and-pipelines` | Idempotent sinks, replay/backfill design |
+| Warehouse, BI, marts, semantic layer | `data-database-analytics-pack` → `analytics-and-warehouse-design` | Grain, lineage, governed metrics |
+| Messaging / events / outbox / DLQ | `platform-integration-pack` → `messaging-and-eventing` | Ordering, idempotency, retry, DLQ, replay (rule 8) |
+| Caching / distributed state / locks | `resilience-performance-pack` → `caching-and-distributed-state` | Staleness, invalidation, authorization, stampede (rule 9) |
+| Resilience / timeouts / circuit / fallback | `resilience-performance-pack` → `resilience-and-fault-tolerance` | Timeouts everywhere, idempotency-aware retry |
+| Background jobs / batch / reconciliation | `platform-integration-pack` → `background-jobs-and-batch-processing` | Idempotent, resumable, observable |
+| Long-running workflows / sagas | `platform-integration-pack` → `workflow-and-job-orchestration` | Explicit state, compensation, manual repair |
+| API gateway / BFF / partner integration | `platform-integration-pack` → `api-gateway-and-service-integration` | Auth propagation, error mapping, contract isolation |
+| Rate limit / throttling / backpressure | `platform-integration-pack` → `rate-limiting-and-traffic-control` | Business-identity keying, fair degradation |
+| File / object storage / signed URLs | `storage-search-stack-pack` → `file-and-object-storage` | Metadata outside object; scan; retention; legal hold |
+| Search / indexing / authorization filtering | `storage-search-stack-pack` → `search-and-indexing` | Source of truth ≠ index; reindex strategy |
+| Auth / identity / secrets | `security-access-pack` → `authn-authz-and-secrets` | Resource-level authz; secret rotation; audit |
+| Security review across surfaces | `security-access-pack` → `security-review` | 4 paths (request/async/derived/operator) |
+| Logs / metrics / traces / cardinality | `observability-release-pack` → `logging-metrics-and-tracing` | Structured, redacted, propagated |
+| SLIs / SLOs / alerts / runbooks | `observability-release-pack` → `monitoring-alerting-and-slos` | Actionable, owned, runbook-linked (rule 10) |
+| Production readiness story / ownership | `observability-release-pack` → `observability-and-sre` | Owner per page; game-day tested |
+| CI/CD / canary / migrations / flags | `observability-release-pack` → `devops-and-release` | Tested rollback; expand-contract; SLO gates (rule 12) |
+| Latency / throughput / profiling | `resilience-performance-pack` → `performance-engineering` | Profile before optimize; bounded concurrency |
 
 Do not duplicate the skill content here. When in doubt, name the skill and trust it to deliver the rules.
 
@@ -263,7 +241,7 @@ Use this structure:
 
 > **Decision**: Introduce a client-generated `Idempotency-Key` (UUIDv4, scoped per logical payment attempt) on `POST /v1/payments`, stored server-side with request hash + final response for 24 h.
 >
-> **Skills consulted**: `api-design` (idempotency contract), `messaging-and-eventing` (downstream effects), `caching-and-distributed-state` (key store), `database-reliability-and-operations` (storage growth), `security-review` (cross-tenant key reuse).
+> **Packs / references consulted**: `core-engineering-pack` → `api-design` (idempotency contract), `platform-integration-pack` → `messaging-and-eventing` (downstream effects), `resilience-performance-pack` → `caching-and-distributed-state` (key store), `data-database-analytics-pack` → `database-reliability-and-operations` (storage growth), `security-access-pack` → `security-review` (cross-tenant key reuse).
 >
 > **Constraints assumed (please confirm)**:
 > - Payment service is the system of record for charge state.
