@@ -1,6 +1,8 @@
 # CE7 Skill Pack Quality Rubric
 
-Use this rubric when improving or reviewing the 7 Copilot-first hybrid pack skills.
+> **Canonical** quality criteria for the 8 Copilot-first hybrid pack skills. Used by `agents/skill-evaluator.agent.md` (interactive evaluation in Copilot Chat) and as the source-of-truth referenced by `evals/scoring-rubric.md`. Automated structural checks live in `scripts/validate_hybrid_packs.py`.
+
+Use this rubric when improving or reviewing the 8 Copilot-first hybrid pack skills.
 
 ## Score Scale
 

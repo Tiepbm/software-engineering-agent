@@ -28,7 +28,8 @@ Use this repository as a Copilot-first software-engineering agent package.
 - Messaging, gateways, rate limits, workflows, jobs, batch → `platform-integration-pack`.
 - Resilience, caching, distributed state, performance → `resilience-performance-pack`.
 - Logs, metrics, traces, SLOs, runbooks, CI/CD, rollout → `observability-release-pack`.
-- File/object storage, search/indexing, .NET, Spring Boot, React, Angular, React Native → `storage-search-stack-pack`.
+- File/object storage, search/indexing → `storage-search-pack`.
+- Framework code (.NET, Spring Boot, React, Angular, React Native) → `application-stacks-pack`.
 
 ## Evaluation
 Use `agents/skill-evaluator.agent.md` for package quality review, trigger accuracy, overlap, progressive disclosure, and token-budget checks.

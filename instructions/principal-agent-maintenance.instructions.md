@@ -45,7 +45,8 @@ When editing routing sections, keep each pack focused and route by responsibilit
 - `platform-integration-pack`: messaging, events, gateways, BFFs, service integration, rate limits, workflows, background jobs, and batch processing.
 - `resilience-performance-pack`: latency, throughput, profiling, caching, distributed state, timeouts, retries, circuit breakers, and failure containment.
 - `observability-release-pack`: structured telemetry, SLIs/SLOs, alerts, runbooks, production readiness, CI/CD, rollouts, migrations, feature flags, and rollback.
-- `storage-search-stack-pack`: file/object storage, search/indexing, and framework-specific implementation details for .NET, Spring Boot, React, Angular, and React Native.
+- `storage-search-pack`: file/object storage, search/indexing, signed URLs, retention, projection, reindex.
+- `application-stacks-pack`: framework-specific implementation for .NET, Spring Boot, React, Angular, and React Native.
 
 Leaf topics such as `api-design`, `security-review`, or `java-spring-boot-development` are now references under packs. Name them as `pack → reference` when precision matters, but do not treat them as peer skills.
 
@@ -87,7 +88,7 @@ The agent must keep at least one **worked example** demonstrating the target out
 
 Before finalizing agent changes, verify:
 
-- The agent still routes to all 7 pack skills that exist in this package.
+- The agent still routes to all 8 pack skills that exist in this package.
 - Leaf references are named only as pack references, not as peer skills.
 - No referenced pack or reference name is missing or misspelled.
 - `.github/agents/` is synchronized with `agents/` when agent files change.

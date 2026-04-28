@@ -74,8 +74,8 @@ Each pack must be written like a senior/principal routing layer:
 
 ### Pack Size and Reference Rules
 
-- Top-level pack skills should normally stay **≤ 220 lines**. If a pack grows beyond this, move detail into `references/`.
-- The package must expose exactly **7 peer pack skills** in both `skills/` and `.github/skills/`.
+- Top-level pack skills must stay **≤ 100 lines** (CI-enforced). Detail belongs in `references/`.
+- The package must expose exactly **8 peer pack skills** in both `skills/` and `.github/skills/`.
 - The package must preserve exactly **33 former leaf references** across pack `references/` directories unless a deliberate migration updates `scripts/validate_hybrid_packs.py` and `evals/routing-benchmark.jsonl`.
 - Former stack-specific references (`*-development`) should retain their detailed implementation depth inside `references/`, not as peer skills.
 
@@ -91,7 +91,8 @@ Do not turn every pack into a giant platform document. Keep packs as routing and
 - Use `platform-integration-pack` references for queues, topics, gateways, workflows, background jobs, rate limiting, retries, DLQs, replay, and consumer operations.
 - Use `resilience-performance-pack` references for TTLs, invalidation, stale reads, locks, timeouts, retries, circuit breakers, performance, and profiling.
 - Use `observability-release-pack` references for logs, metrics, traces, SLIs, SLOs, dashboards, alerts, runbooks, CI/CD, rollout, and release safety.
-- Use `storage-search-stack-pack` references for object storage, search projections, authorization filtering, reindexing, and stack-specific implementation.
+- Use `storage-search-pack` references for object storage, search projections, authorization filtering, and reindexing.
+- Use `application-stacks-pack` references for framework-specific implementation (.NET, Spring Boot, React, Angular, React Native).
 - Use `data-database-analytics-pack` references for data models, database decisions, SQL/ORM tuning, DB operations, pipelines, warehouses, and analytics.
 - Use `core-engineering-pack` references for requirements, architecture, system design, APIs, testing, review, and refactoring.
 

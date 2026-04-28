@@ -1,0 +1,13 @@
+{"target":"agent","path":"agents/ce7-software-engineering.agent.md","max_lines":160,"max_chars":9000,"reason":"Principal agent must stay <= 1.2k tokens (~160 lines)"}
+{"target":"pack","path":"skills/core-engineering-pack/SKILL.md","max_lines":100,"max_chars":4500,"reason":"Trim-pack budget"}
+{"target":"pack","path":"skills/data-database-analytics-pack/SKILL.md","max_lines":100,"max_chars":4500,"reason":"Trim-pack budget"}
+{"target":"pack","path":"skills/security-access-pack/SKILL.md","max_lines":100,"max_chars":4500,"reason":"Trim-pack budget"}
+{"target":"pack","path":"skills/platform-integration-pack/SKILL.md","max_lines":100,"max_chars":4500,"reason":"Trim-pack budget"}
+{"target":"pack","path":"skills/resilience-performance-pack/SKILL.md","max_lines":100,"max_chars":4500,"reason":"Trim-pack budget"}
+{"target":"pack","path":"skills/observability-release-pack/SKILL.md","max_lines":100,"max_chars":4500,"reason":"Trim-pack budget"}
+{"target":"pack","path":"skills/storage-search-pack/SKILL.md","max_lines":100,"max_chars":4500,"reason":"Trim-pack budget"}
+{"target":"pack","path":"skills/application-stacks-pack/SKILL.md","max_lines":100,"max_chars":4500,"reason":"Trim-pack budget"}
+{"target":"reference","path_glob":"skills/*/references/*.md","max_lines":250,"max_chars":12000,"warn_lines":220,"reason":"Reference deep playbook ceiling; warn beyond 220 lines, fail beyond 250"}
+{"target":"agent-context","scenario":"single-pack","max_total_chars":12000,"includes":["agent","pack-SKILL.md"],"reason":"Single-pack activation context budget"}
+{"target":"agent-context","scenario":"multi-pack-3","max_total_chars":24000,"includes":["agent","3 pack SKILL.md","up to 3 references"],"reason":"3-pack cross-domain activation context budget"}
+

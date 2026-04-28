@@ -1,5 +1,48 @@
 # Changelog
 
+## 2026-04-28 — P1/P2 follow-ups (3 new references, AGENTS.md, README trim, evaluator scope split)
+
+### Added
+- 3 new reference playbooks (33 → 36 references):
+  - `core-engineering-pack/references/architecture-decision-records.md` — ADR template, lifecycle, decision-quality checklist, common failure modes.
+  - `observability-release-pack/references/incident-response-and-postmortem.md` — severity matrix, IC/Ops/Comms/Scribe roles, mitigation-first discipline, blameless postmortem template, action-item discipline, regulated-domain additions.
+  - `resilience-performance-pack/references/cost-and-finops.md` — FinOps loop, unit economics, attribution, pricing models, high-impact cost traps, denial-of-wallet protection, regulated retention rules.
+- `AGENTS.md` at repo root — short editing rules and workflow for human contributors.
+- `docs/INSTALL.md` — install modes (global / workspace / per-project) extracted from old README.
+
+### Changed
+- `README.md` trimmed from 353 → 84 lines (-76%). Install detail moved to `docs/INSTALL.md`. Added documentation map and CI-enforced quality gates summary.
+- `scripts/validate_hybrid_packs.py` updated for 36 references and the 3 new reference names.
+- 3 pack `SKILL.md` extended with one new row each in their `Pack Reference Map`.
+- `agents/skill-evaluator.agent.md` — added scope-split note pointing at `docs/skill-pack-quality-rubric.md` as canonical; eliminates the previous 70 % overlap by making evaluator agent purely interactive and deferring criteria to the rubric.
+- `docs/skill-pack-quality-rubric.md` — header updated to mark itself canonical and reference the evaluator agent + scoring-rubric consumers.
+
+### Notes for the maintainer
+- `.github/skills/` mirror not yet synced for the 3 new references and the updated 3 pack SKILL.md (per agreed split of responsibility — user syncs `.github/` manually).
+- `evals/banking-insurance-benchmark.jsonl` row count unchanged (10); rubric coverage still applies to new references.
+
+## 2026-04-28 — P0 review fixes (agent trim, pack split, pack-trim, evals expansion)
+
+### Changed (BREAKING for runtime layout)
+- **Split `storage-search-stack-pack` → `storage-search-pack` + `application-stacks-pack`** (8 packs total). Storage/search infra is now decoupled from framework-specific stacks; routing precision should improve for both axes. Eval files updated; references moved (no content change).
+- **Rewrote principal agent** (`agents/ce7-software-engineering.agent.md`) from 320 → ~110 lines (~-60% tokens). Replaced 4 overlapping rule layers (Operating Rules + Default Review Lenses + Cross-Cutting Routing + Stop Conditions + Prohibited Behavior) with a single `Production Bar` table. Added `Tie-Break Rules` for cross-pack ambiguity. Few-shot moved to `examples/`.
+- **Trimmed all 8 pack `SKILL.md`** to a uniform short template (frontmatter + `When to Use` + `When NOT to Use` + `Pack Reference Map` + `Cross-Pack Handoffs`). Removed boilerplate sections (`Purpose`, `Routing Rules`, `Reference Selection Matrix`, `Expected Output Style`, `Token Efficiency Rules`, `Quality Gates`) — now owned by the new shared instructions file. Reference selection rules now carry **distinct `Use when` triggers** instead of tautological filler. Estimated ~50% token reduction per pack.
+- **Updated `scripts/validate_hybrid_packs.py`** for 8 packs and a 100-line pack budget.
+- **Updated `.github/copilot-instructions.md`** and `instructions/principal-{agent,skills}-maintenance.instructions.md` for the new pack layout.
+
+### Added
+- `instructions/pack-conventions.instructions.md` — single source of truth for pack output style / token rules / quality gates / structure. Replaces 6 boilerplate sections previously duplicated across 7 packs.
+- `examples/architecture-payment-idempotency.md`, `examples/debugging-cache-latency.md`, `examples/review-pr-checklist.md` — three task-type output shapes referenced by the agent.
+- `evals/anti-pattern-benchmark.jsonl` — 10 prompts that test what the agent must NOT do (retry without idempotency, cache without invalidation, monitoring without runbook, DB without workload-fit, deploy without rollback, search-as-source-of-truth, async without DLQ, PII in logs, route-level-authz only, perf fix without profile).
+- `evals/token-budget.jsonl` — agent and pack token budgets and 1-pack / 3-pack context-load scenarios.
+- `evals/routing-benchmark.jsonl` — added 8 boundary cases (outbox, redis-session-vs-store, signed-URL+callback, PII logging, gateway+circuit, CDC pipeline, stack+platform, search projection) and 2 ambiguity cases (must ASK_FOR_CONSTRAINTS instead of activating a pack). Total: 25 cases.
+- `reports/CE7-AGENT-SYSTEM-REVIEW-2026-04-28.md` — brutal review report driving these P0 changes.
+
+### Migration notes
+- The user will manually sync `.github/skills/` and `.github/agents/` mirrors after this commit.
+- `REVIEW.md` self-rating of 9.2 is no longer valid; rerun benchmarks before re-scoring.
+- `agents/skill-evaluator.agent.md` and `docs/skill-pack-quality-rubric.md` overlap ~70%; consolidating one is a follow-up (P2, optional later).
+
 ## 2026-04-27 — Self-evaluation automation and budget-friendly workflow
 
 ### Added
