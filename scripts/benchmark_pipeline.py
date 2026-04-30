@@ -43,7 +43,8 @@ PACKS = [
     "platform-integration-pack",
     "resilience-performance-pack",
     "observability-release-pack",
-    "storage-search-stack-pack",
+    "storage-search-pack",
+    "application-stacks-pack",
 ]
 REFERENCES = [
     "requirements-analysis",

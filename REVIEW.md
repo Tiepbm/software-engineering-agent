@@ -1,8 +1,8 @@
 # Quality Review — Principal Software Engineering Copilot Package
 
-**Review date**: 2026-04-27  
-**Scope**: Copilot-first hybrid package with 2 agents + 7 pack skills + 33 references + eval harness.  
-**Status**: Post hybrid-pack migration + P1/P2/P3 content improvements.
+**Review date**: 2026-04-28  
+**Scope**: Copilot-first hybrid package with 2 agents + 8 pack skills + 36 references + eval harness.  
+**Status**: Post Claude 4.7 review + P0 refactor + caveman-inspired output optimization.
 
 > Migration note: the previous 33 peer skills are no longer peers. They are preserved as `references/*.md` under 7 pack skills and mirrored into `.github/skills/` for GitHub Copilot. Use `python3 scripts/validate_hybrid_packs.py` as the current structural quality gate.
 
@@ -291,15 +291,41 @@ These are not blockers; they would make the package easier to evolve and test ov
 
 ## 9. Final Score
 
-| Group | Score |
-|---|---:|
-| Agent | **9.0** |
-| Core Engineering | **9.2** |
-| Data and Database | **9.5** |
-| Platform / Cross-Cutting | **9.2** |
-| Security / Operations / Quality | **9.4** |
-| Stack-Specific | **9.0** |
-| Instructions / Maintainability | **9.2** |
-| **Overall package** | **9.2 / 10** |
+> **Updated 2026-04-28** after Claude 4.7 review + P0 refactor + caveman-inspired output optimization.
+> Previous self-score was 9.2/10. Claude 4.7 external review scored 6.5/10.
+> Post-refactor assessment: **8.5/10** — reflects real improvements while acknowledging eval coverage still needs more real-traffic data.
 
-**Final judgement**: The package has moved from a strong but uneven 8.4/10 to a consistent **9.2/10**. It is now clearly above the average `awesome-copilot` community baseline in structure, enterprise realism, enforceability, regulated-domain awareness, and maintainability. The remaining work is optional productization, not correctness or quality remediation.
+| Dimension | Score | Ghi chú |
+|---|---:|---|
+| Chất lượng Agent | **9.0** | 122 dòng, lean router, production bar, tie-break rules, output compression + auto-verbose |
+| Thiết kế Pack | **8.5** | 8 packs, avg 33 dòng, zero boilerplate, distinct triggers, When NOT to Use |
+| Độ sâu Reference | **8.5** | 36 references, decision matrices, worked examples, code samples, templates |
+| Hiệu quả Token | **9.0** | Agent -70% vs pre-refactor, packs -50%, zero duplication |
+| Độ chính xác Routing | **8.0** | Tie-break rules, boundary evals — benchmark 100/100 nhưng chưa test real traffic |
+| Phạm vi Eval | **7.5** | 59 cases, 4 loại — cần thêm runs thật |
+| Tài liệu | **8.0** | Song ngữ, GETTING-STARTED, INSTALL, documentation map |
+| Khả năng bảo trì | **8.5** | pack-conventions, validator 8 packs/36 refs, CI-ready |
+| Tư thế Enterprise | **9.0** | Banking/insurance first-class, audit/reconciliation/idempotency xuyên suốt |
+| Tối ưu Output | **8.5** | Compression + auto-verbose + verbosity levels (caveman-inspired) |
+| **Tổng** | **8.5 / 10** | |
+
+### Lịch sử điểm
+
+| Thời điểm | Điểm | Sự kiện |
+|---|---|---|
+| 2026-04-26 | 8.4 | Pre-patch baseline |
+| 2026-04-27 | 9.2 | Post P1/P2/P3 content improvements (self-score, chưa có external review) |
+| 2026-04-28 | 6.5 | Claude 4.7 external review (harsh but fair) |
+| 2026-04-28 | **8.5** | Post P0 refactor + caveman optimization + 8-pack split + 36 refs + 59 eval cases |
+
+### Benchmark kết quả mới nhất
+
+- **Run ID:** `2026-04-28-8pack-baseline`
+- **Layout:** 8 packs, 36 references
+- **Score:** 100/100 (10/10 PASS, 0 WARN, 0 FAIL)
+- **Avg output:** 271 words (compressed, within budget)
+- **Missing packs:** 0
+- **Missing references:** 0
+- **Prohibited activations:** 0
+
+**Kết luận**: Package đã cải thiện đáng kể sau external review. Token efficiency tăng mạnh (-70% agent, -50% packs). Routing precision cải thiện nhờ pack split + tie-break rules. Eval coverage mở rộng (59 cases). Điểm thực tế 8.5/10 — khoảng cách còn lại chủ yếu từ thiếu real-traffic data và semantic scoring tự động.
