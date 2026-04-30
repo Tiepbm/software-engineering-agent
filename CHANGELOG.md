@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-04-28 — Caveman-inspired output optimization (P1-P4)
+
+### Added
+- **Output Compression rules** (P1) in agent: drop filler/pleasantries/hedging, lead with decision, tables over prose, code blocks over descriptions. Inspired by caveman project's token reduction approach (~30-40% output token savings).
+- **Auto-Verbose safety valve** (P3) in agent: 6 conditions where agent must use full prose (security findings, irreversible actions, compliance, rollback decisions, production stops, user confusion). Prevents compression from hiding critical information.
+- **Output Verbosity levels** (P2) in agent: Quick (50-150 tokens) / Standard (300-800) / Deep (800-1500). Auto-detected from risk class and question scope. User can override with "/quick" or "/deep".
+- **Terse Review Format** (P4) in `code-review-and-refactoring.md`: one-line-per-finding format (`L42: 🔴 bug: user null. Add guard.`) with severity emoji, category, and summary line. For quick reviews and large PRs.
+- `docs/PLAN-automatic-memory.md` — plan for MCP-based automatic memory system (Phase 1-4, not yet implemented).
+
+### Changed
+- Agent file: 108 → 122 lines (added 4 sections, still well under 150-line budget).
+- `docs/external-skill-research.md` updated with caveman project patterns.
+- `memory/learned-patterns.md` fixed stale pack name (`storage-search-stack-pack` → `storage-search-pack`).
+
 ## 2026-04-28 — P1/P2 follow-ups (3 new references, AGENTS.md, README trim, evaluator scope split)
 
 ### Added

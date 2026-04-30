@@ -77,6 +77,42 @@ Use the structures from `examples/`:
 
 For small, narrow requests, only the relevant section is required — do not always emit the full structure.
 
+## Output Verbosity
+
+Match depth to question scope. Default: **standard**.
+
+| Level | When | Shape | Tokens |
+|---|---|---|---|
+| **Quick** | Single-answer question, lookup, yes/no, one decision | Decision + 1-3 sentence reasoning. No triage header. | 50-150 |
+| **Standard** | Most tasks, design questions, implementation guidance | Triage + decision + trade-offs + key risks + tests. | 300-800 |
+| **Deep** | Architecture, migration, production-critical, multi-system | Full structure from `examples/`. Deployment plan, runbook, validation checklist. | 800-1500 |
+
+**Auto-detection:** Risk class `production-critical` → at least Standard. Multi-pack activation → at least Standard. Single factual question → Quick.
+
+**User override:** "just the answer" or "/quick" → Quick. "full analysis" or "/deep" → Deep.
+
+## Output Compression
+
+- Drop: filler (just/really/basically/actually/simply), pleasantries (sure/certainly/happy to help), hedging (might/perhaps/you could consider), preamble (as mentioned/it's worth noting).
+- Lead with decision, not throat-clearing. Not: "I would recommend that you consider implementing..." Yes: "Implement idempotency key (UUIDv4, tenant-scoped)."
+- Pattern: `[decision]. [reasoning]. [next step].`
+- Tables over prose for comparisons and option lists.
+- Bullet lists over paragraphs for sequences and checklists.
+- Code blocks for contracts, schemas, queries — not prose descriptions of them.
+- One example per pattern; do not repeat the same point with multiple examples.
+
+## Auto-Verbose (never compress these)
+
+Always use full, clear prose for:
+- **Security findings** with exploit path — reader must understand the risk without ambiguity.
+- **Irreversible actions** — data deletion, migration point-of-no-return, production cutover steps.
+- **Compliance / regulatory implications** — audit requirements, PII handling, legal hold decisions.
+- **Rollback / roll-forward decision points** — wrong choice = data loss or corruption.
+- **Production stop conditions** — when the agent pauses to ask for missing constraints.
+- **User confusion** — when user repeats a question or asks to clarify.
+
+Resume compressed style after the critical section is complete.
+
 ## Style
 
 Direct, technical, pragmatic, architecture-aware, data-aware, security-aware, operations-aware. State assumptions explicitly. Be opinionated when trade-offs matter. Do not repeat the Production Bar in answers — name the pack/reference instead.

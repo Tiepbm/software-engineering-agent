@@ -140,3 +140,38 @@ Platform risk checks are mandatory when a refactor changes where side effects ha
 - Removing “duplicate” fields or logs can break audit, reconciliation, support tooling, dashboards, or downstream reports.
 - A refactor can pass unit tests while breaking observability because metric names, log fields, trace attributes, or alert dimensions changed.
 - Mixed-version deployments expose compatibility bugs that local refactors miss: old producer/new consumer, new API/old mobile client, old job/new schema.
+
+## Terse Review Format
+
+Use this format for quick reviews, large PRs (> 20 findings), or when user requests "terse review" / "quick review". One line per finding.
+
+**Format:** `<file>:L<line>: <severity> <category>: <problem>. <fix>.`
+
+**Severity:**
+- `🔴 blocker` — data loss, auth bypass, financial corruption, broken public contract
+- `🟠 high` — likely production defect, missing rollback, unsafe side effect
+- `🟡 medium` — maintainability, testability, bounded correctness issue
+- `🔵 low` — readability, naming, small duplication
+- `⚪ nit` — formatting, preference, no behavior impact
+
+**Category:** `bug` | `security` | `auth` | `data` | `perf` | `test` | `migration` | `ops` | `style`
+
+**Example terse review:**
+
+```
+PaymentService.java:L42:  🔴 bug: user null after .findById(). Guard before .email access.
+PaymentService.java:L67:  🟠 security: idempotency key from client not tenant-scoped. Add (tenant_id, key) composite.
+PaymentService.java:L88:  🟠 data: outbox INSERT outside @Transactional boundary. Move into same TX as payment UPDATE.
+PaymentService.java:L120: 🟡 perf: N+1 query in loop. Use @EntityGraph or batch IN clause.
+PaymentService.java:L155: 🟡 ops: no correlation_id in log. Add MDC.put("correlation_id", ctx.correlationId()).
+PaymentService.java:L180: 🔵 test: no test for duplicate callback. Add: same psp_reference twice → no state change.
+PaymentService.java:L200: ⚪ nit: unused import. Remove.
+
+Summary: 1 blocker, 2 high, 2 medium, 1 low, 1 nit. Block on L42 + L67 + L88.
+```
+
+**Rules:**
+- Always include `Summary` line at the end with counts per severity.
+- Always state which findings block merge.
+- Use Standard (prose) format for: security findings with exploit path, architecture disagreements, onboarding contexts where author needs the "why".
+- Escalate severity one level when change touches regulated data, tenant isolation, money, or customer communications.

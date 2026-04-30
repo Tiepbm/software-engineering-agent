@@ -32,6 +32,7 @@ The repository remains original: external projects provide design patterns, eval
 | `superpowers` | `writing-skills`, `using-superpowers`, `test-driven-development`, `systematic-debugging` | Trigger-only descriptions, skill TDD, pressure scenarios, root-cause-before-fix, evidence-before-claims | `Use when` descriptions, benchmark-first improvement discipline, debug/implementation response expectations |
 | `oh-my-openagent` | README orchestration sections, Copilot/rules discovery tests | Copilot `.github/copilot-instructions.md` discovery, rules injection, context-lean background/specialist routing | Copilot-first target, `.github/agents`, `.github/skills`, pack-first routing |
 | `claude-mem` | README progressive disclosure and memory search workflow | Multi-layer retrieval: compact index → contextual timeline → full details only when selected | Pack → reference progressive disclosure and token-budget rules |
+| `caveman` | `SKILL.md`, `caveman-review/SKILL.md`, `caveman-compress/SKILL.md`, `evals/README.md`, `hooks/` | Output compression rules (drop filler/hedging/pleasantries), intensity levels (lite/full/ultra), auto-clarity (verbose for critical content), terse review format (1-line per finding), 3-arm eval harness (baseline vs terse vs skill), multi-agent distribution via `npx skills` | Output Compression + Auto-Verbose in agent, Verbosity Levels (Quick/Standard/Deep), Terse Review Format in `code-review-and-refactoring.md`, future: compress tool for memory files |
 
 ## Adopted Design Principles
 
@@ -82,6 +83,24 @@ Release advice is weak without metrics, smoke tests, rollback/roll-forward paths
 Agent behavior degrades when README, instructions, packs, `.github` mirrors, and evals drift apart.
 
 **CE7 rule:** repository updates must keep docs, instructions, `.github` mirrors, root skills, and validator expectations synchronized.
+
+### 9. Compress output, not substance (from caveman)
+
+Output tokens can be reduced ~30-40% by dropping filler, hedging, and pleasantries without losing technical accuracy. Lead with decision, use tables over prose, code blocks over descriptions.
+
+**CE7 rule:** agent has explicit Output Compression rules. Pattern: `[decision]. [reasoning]. [next step].` Drop filler/hedging/pleasantries. Tables for comparisons.
+
+### 10. Auto-verbose for critical content (from caveman)
+
+Compression must never hide security warnings, irreversible actions, compliance implications, or rollback decisions. Agent must automatically switch to full prose for these.
+
+**CE7 rule:** agent has Auto-Verbose section listing 6 conditions that override compression. Resume compressed style after critical section.
+
+### 11. User-controlled output depth (from caveman)
+
+Different questions need different output lengths. A lookup question should not produce an 800-word analysis.
+
+**CE7 rule:** agent supports Quick/Standard/Deep verbosity levels. Auto-detected from risk class and question scope. User can override.
 
 ## Rejected / Deferred Patterns
 

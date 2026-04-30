@@ -10,7 +10,7 @@
 
 2. **Migration/schema change** → always include: `observability-release-pack` (expand-contract, rollback gates) + `data-database-analytics-pack` (backfill, reconciliation). Migration is a release problem, not just a data problem.
 
-3. **Document upload/storage** → always include: `storage-search-stack-pack` (signed URLs, scan, retention) + `security-access-pack` (access control, malware). Never serve files before scan completes.
+3. **Document upload/storage** → always include: `storage-search-pack` (signed URLs, scan, retention) + `security-access-pack` (access control, malware). Never serve files before scan completes.
 
 4. **Workflow/approval** → prefer orchestration over choreography when audit trail and manual review are required (banking, insurance, regulated).
 
