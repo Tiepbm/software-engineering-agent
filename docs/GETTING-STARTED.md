@@ -71,3 +71,46 @@ Your prompt
 - **Evidence before claims**: recommendations include validation steps.
 - **Enterprise posture**: data correctness, auditability, security, and operability are first-class.
 - **Progressive disclosure**: packs are routing layers; depth lives in `references/*.md`.
+
+## When to use this agent
+
+This agent is a **principal-level engineering panel**, not a coding assistant. It adds the most value when you need architectural decisions, trade-off analysis, and production-safety guidance.
+
+### Best for (agent adds significant value)
+
+| Question type | Example |
+|---|---|
+| System design | "Design payment idempotency for mobile banking" |
+| Database selection | "PostgreSQL or MongoDB for claims system?" |
+| Architecture review | "Review this PR for migration and rollback risk" |
+| Security review | "Review this endpoint for tenant isolation" |
+| Data modeling | "Design SCD Type 2 for policy versioning" |
+| DevOps / release | "Plan canary rollout with SLO gates" |
+| Performance diagnosis | "Diagnose high p95 latency after adding Redis cache" |
+| Integration design | "Design outbox pattern for payment events" |
+
+### OK for (agent helps with patterns, not full code)
+
+| Question type | What you get |
+|---|---|
+| "Write outbox pattern in Spring Boot" | Code pattern from reference + architectural context |
+| "Implement idempotency middleware in .NET" | Code example + production checklist |
+| "Setup TanStack Query with auth refresh" | Code pattern + security considerations |
+| "Fix N+1 query in JPA" | EXPLAIN walkthrough + index recommendation |
+
+### Not designed for (use the model directly)
+
+| Question type | Why |
+|---|---|
+| "Write a sort function" | Basic coding — model already knows, agent adds no value |
+| "Debug CSS layout" | Frontend layout is outside agent scope |
+| "Convert Python to Go" | Language translation — no reference coverage |
+| "Explain async/await for beginners" | Tutorial content — agent is for decisions, not teaching |
+
+### Recommended workflow
+
+For implementation tasks, combine the agent with direct model usage:
+
+1. **Ask CE7**: "What pattern should I use for payment retry?" → Get architecture decision + trade-offs + checklist
+2. **Ask model directly**: "Implement that pattern in Spring Boot" → Get working code
+3. **Ask CE7**: "Review this implementation for production risks" → Get security/ops/data review

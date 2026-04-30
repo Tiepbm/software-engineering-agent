@@ -27,6 +27,7 @@ description: 'Use when modeling domain data, choosing a database, optimizing SQL
 | `database-reliability-and-operations` | Use when planning backup/restore, failover, schema migration sequencing, expand-contract, or DB incident response. |
 | `data-engineering-and-pipelines` | Use when designing ETL/ELT/CDC, replay/backfill, idempotent sinks, schema evolution, or data-quality controls. |
 | `analytics-and-warehouse-design` | Use when designing facts/dimensions, semantic layer, governed metrics, marts, lineage, or BI consumption. |
+| `databricks-lakehouse` | Use when designing Databricks/lakehouse medallion architecture, Delta Lake CDC ingestion from RDBMS, Unity Catalog governance, or insurance/banking analytical models on Databricks. |
 
 ## Cross-Pack Handoffs
 - → `platform-integration-pack` for outbox consumer / DLQ / replay protocol.

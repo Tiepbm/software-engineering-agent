@@ -71,3 +71,46 @@ Prompt của bạn
 - **Evidence before claims**: khuyến nghị phải kèm validation steps.
 - **Enterprise posture**: data correctness, auditability, security, operability là ưu tiên hàng đầu.
 - **Progressive disclosure**: packs là routing layers; chi tiết nằm trong `references/*.md`.
+
+## Khi nào nên dùng agent này
+
+Agent này là **principal-level engineering panel**, không phải coding assistant. Nó mang lại giá trị cao nhất khi bạn cần quyết định kiến trúc, phân tích trade-offs, và hướng dẫn production-safety.
+
+### Rất phù hợp (agent thêm giá trị đáng kể)
+
+| Loại câu hỏi | Ví dụ |
+|---|---|
+| Thiết kế hệ thống | "Thiết kế payment idempotency cho mobile banking" |
+| Chọn database | "PostgreSQL hay MongoDB cho claims system?" |
+| Review kiến trúc | "Review PR này về rủi ro migration và rollback" |
+| Review bảo mật | "Review endpoint này về tenant isolation" |
+| Data modeling | "Thiết kế SCD Type 2 cho policy versioning" |
+| DevOps / release | "Lập kế hoạch canary rollout với SLO gates" |
+| Chẩn đoán performance | "Chẩn đoán p95 latency cao sau khi thêm Redis cache" |
+| Thiết kế integration | "Thiết kế outbox pattern cho payment events" |
+
+### Khá phù hợp (agent hỗ trợ patterns, không viết full code)
+
+| Loại câu hỏi | Bạn nhận được gì |
+|---|---|
+| "Viết outbox pattern bằng Spring Boot" | Code pattern từ reference + architectural context |
+| "Implement idempotency middleware .NET" | Code example + production checklist |
+| "Setup TanStack Query với auth refresh" | Code pattern + security considerations |
+| "Fix N+1 query trong JPA" | EXPLAIN walkthrough + index recommendation |
+
+### Không phù hợp (dùng model trực tiếp)
+
+| Loại câu hỏi | Lý do |
+|---|---|
+| "Viết function sort array" | Coding cơ bản — model đã biết, agent không thêm giá trị |
+| "Debug lỗi CSS layout" | Frontend layout ngoài scope agent |
+| "Convert code Python sang Go" | Dịch ngôn ngữ — không có reference coverage |
+| "Giải thích async/await cho người mới" | Nội dung tutorial — agent dành cho decisions, không phải dạy học |
+
+### Workflow khuyến nghị
+
+Với các task implementation, kết hợp agent với model trực tiếp:
+
+1. **Hỏi CE7**: "Nên dùng pattern nào cho payment retry?" → Nhận quyết định kiến trúc + trade-offs + checklist
+2. **Hỏi model trực tiếp**: "Implement pattern đó bằng Spring Boot" → Nhận code hoạt động
+3. **Hỏi CE7**: "Review implementation này về production risks" → Nhận review security/ops/data

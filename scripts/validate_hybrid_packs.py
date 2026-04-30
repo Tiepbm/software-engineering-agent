@@ -16,6 +16,8 @@ EXPECTED = {
         "api-design",
         "testing-strategy",
         "code-review-and-refactoring",
+        "architecture-decision-records",
+        "legacy-modernization",
     ],
     "data-database-analytics-pack": [
         "data-modeling",
@@ -24,6 +26,7 @@ EXPECTED = {
         "database-reliability-and-operations",
         "data-engineering-and-pipelines",
         "analytics-and-warehouse-design",
+        "databricks-lakehouse",
     ],
     "security-access-pack": ["security-review", "authn-authz-and-secrets"],
     "platform-integration-pack": [
@@ -37,12 +40,15 @@ EXPECTED = {
         "resilience-and-fault-tolerance",
         "caching-and-distributed-state",
         "performance-engineering",
+        "cost-and-finops",
     ],
     "observability-release-pack": [
         "logging-metrics-and-tracing",
         "monitoring-alerting-and-slos",
         "observability-and-sre",
         "devops-and-release",
+        "incident-response-and-postmortem",
+        "aws-cloud-architecture",
     ],
     "storage-search-pack": [
         "file-and-object-storage",
@@ -104,8 +110,8 @@ def check_skill_tree(base: Path, label: str, errors: list[str]) -> None:
                 fail(errors, f"{label}: missing reference {ref_path.relative_to(ROOT)}")
 
     all_refs = list(base.glob("*/references/*.md"))
-    if len(all_refs) != 36:
-        fail(errors, f"{label}: expected 36 references, found {len(all_refs)}")
+    if len(all_refs) != 39:
+        fail(errors, f"{label}: expected 39 references, found {len(all_refs)}")
 
     leaf_peer_names = {ref for refs in EXPECTED.values() for ref in refs}
     bad_peer_leafs = sorted(name for name in peer_skills if name in leaf_peer_names)
@@ -332,7 +338,7 @@ def main() -> int:
 
     print("PASS: hybrid pack layout is valid")
     print("- peer pack skills: 8")
-    print("- leaf references: 36")
+    print("- leaf references: 39")
     print("- agents: ce7-software-engineering, skill-evaluator")
     print("- deferred agents absent")
     print("- routing benchmark present")

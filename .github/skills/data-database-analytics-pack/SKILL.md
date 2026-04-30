@@ -1,62 +1,37 @@
 ---
 name: data-database-analytics-pack
-description: 'Use when modeling domain data, selecting databases, optimizing SQL/ORM queries, operating production databases, building pipelines, or designing analytics and warehouse consumption paths.'
+description: 'Use when modeling domain data, choosing a database, optimizing SQL/ORM, operating production DBs, building pipelines (ETL/ELT/CDC), or designing analytics/warehouse consumption.'
 ---
 # Data, Database, and Analytics Pack
 
-## Description
-This is a Copilot-first hybrid pack skill for data modeling, database architecture, SQL/query optimization, database operations, data pipelines, analytics, and warehouse design. It is intentionally a routing and synthesis layer. Load only the referenced leaf document needed for the specific subdomain instead of expanding every topic by default.
-
-## Purpose
-- Provide one high-signal activation surface for a related engineering domain.
-- Keep token usage low by using this pack as the default context and loading `references/*.md` only when the task requires deeper guidance.
-- Preserve principal-level enterprise guidance from the previous leaf skills without keeping 33 peer skills in the Copilot skill namespace.
-
 ## When to Use
-- Entities, aggregates, transactional boundaries, history, auditability, or reporting implications.
-- Database family selection, source-of-truth choices, indexing, partitioning, scaling, or retention.
-- Query plans, ORM-generated SQL, locks, pagination, replication, failover, backup, restore, or migrations.
-- ETL/ELT/CDC, streaming, replay, backfill, data quality, marts, metrics, semantic layers, or BI cost controls.
+- Aggregates, source-of-truth, history/SCD, audit trail, transactional boundaries, derived state ownership.
+- DB family/topology selection, partitioning, replication, scaling, retention, recovery model.
+- Slow query, bad plan, lock contention, ORM N+1, pagination at scale.
+- Backup/restore, failover drill, schema migration sequencing, expand-contract.
+- ETL/ELT/CDC, replay, backfill, idempotent sinks, data quality, lineage.
+- Marts, semantic layer, governed metrics, BI cost control.
+
+## When NOT to Use
+- Runtime cache or distributed locks → `resilience-performance-pack`.
+- Search index design (even on top of DB) → `storage-search-pack`.
+- Outbox CONSUMER side / replay protocol / DLQ → `platform-integration-pack`.
+- File/object storage of documents and assets → `storage-search-pack`.
 
 ## Pack Reference Map
-- `references/data-modeling.md` — `data-modeling`
-- `references/database-architecture.md` — `database-architecture`
-- `references/sql-and-query-optimization.md` — `sql-and-query-optimization`
-- `references/database-reliability-and-operations.md` — `database-reliability-and-operations`
-- `references/data-engineering-and-pipelines.md` — `data-engineering-and-pipelines`
-- `references/analytics-and-warehouse-design.md` — `analytics-and-warehouse-design`
-
-## Routing Rules
-- Start with this pack's summary guidance for broad or ambiguous requests.
-- Read a reference file only when its subdomain affects the recommendation, implementation, review, or validation plan.
-- If more than three references appear necessary, state the primary reference first and summarize why each additional reference is required.
-- For cross-domain work, combine this pack with the adjacent pack named by `ce7-software-engineering.agent.md` instead of copying unrelated guidance here.
-
-## Reference Selection Matrix
-| Reference | Selection rule |
+| Reference | Use when |
 |---|---|
-| `data-modeling` | Read `references/data-modeling.md` when this exact subdomain is material to the answer. |
-| `database-architecture` | Read `references/database-architecture.md` when this exact subdomain is material to the answer. |
-| `sql-and-query-optimization` | Read `references/sql-and-query-optimization.md` when this exact subdomain is material to the answer. |
-| `database-reliability-and-operations` | Read `references/database-reliability-and-operations.md` when this exact subdomain is material to the answer. |
-| `data-engineering-and-pipelines` | Read `references/data-engineering-and-pipelines.md` when this exact subdomain is material to the answer. |
-| `analytics-and-warehouse-design` | Read `references/analytics-and-warehouse-design.md` when this exact subdomain is material to the answer. |
+| `data-modeling` | Use when defining aggregates, source-of-truth ownership, SCD/history, derived-state rules, or domain invariants. |
+| `database-architecture` | Use when CHOOSING a database family, topology, partitioning/replication/sharding strategy, or doing workload-fit reasoning across access patterns. |
+| `sql-and-query-optimization` | Use when a SPECIFIC query/ORM call is slow, locks, or has a bad plan — focus on EXPLAIN, indexes, statistics, rewrites. |
+| `database-reliability-and-operations` | Use when planning backup/restore, failover, schema migration sequencing, expand-contract, or DB incident response. |
+| `data-engineering-and-pipelines` | Use when designing ETL/ELT/CDC, replay/backfill, idempotent sinks, schema evolution, or data-quality controls. |
+| `analytics-and-warehouse-design` | Use when designing facts/dimensions, semantic layer, governed metrics, marts, lineage, or BI consumption. |
+| `databricks-lakehouse` | Use when designing Databricks/lakehouse medallion architecture, Delta Lake CDC ingestion from RDBMS, Unity Catalog governance, or insurance/banking analytical models on Databricks. |
 
-## Expected Output Style
-- Start with the decision or finding before the reasoning.
-- Name the reference documents consulted when the work is non-trivial.
-- Separate immediate action, design trade-offs, tests, operational checks, and follow-up work.
-- Keep the answer concrete: include contracts, schemas, rollout gates, checklists, or examples when they reduce ambiguity.
+## Cross-Pack Handoffs
+- → `platform-integration-pack` for outbox consumer / DLQ / replay protocol.
+- → `observability-release-pack` for migration release safety + DB SLOs + restore drills.
+- → `security-access-pack` for row-level / tenant authz and sensitive-column masking.
+- → `storage-search-pack` for projecting OLTP data into a search index.
 
-## Token Efficiency Rules
-- Do not paste large portions of reference files into the response.
-- Prefer a short synthesized rule plus a pointer to the exact reference when more depth is needed.
-- Avoid activating unrelated packs just because their concerns are generally useful.
-- Treat the pack as metadata + routing; treat `references/` as progressive disclosure.
-
-## Quality Gates
-Before finalizing work using this pack, verify:
-- The selected references match the user's actual risk and task type.
-- Security, data correctness, observability, delivery, and failure behavior are covered when they materially affect production risk.
-- Recommendations are testable and include validation evidence.
-- Any rejected option includes the reason it was rejected.

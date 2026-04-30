@@ -1,62 +1,37 @@
 ---
 name: core-engineering-pack
-description: 'Use when clarifying requirements, shaping solution architecture, designing system/API boundaries, defining tests, or reviewing/refactoring software for maintainability and delivery risk.'
+description: 'Use when clarifying requirements, shaping solution architecture, designing system/API boundaries, defining test strategy, or reviewing/refactoring software for maintainability and delivery risk.'
 ---
 # Core Engineering Pack
 
-## Description
-This is a Copilot-first hybrid pack skill for requirements, solution architecture, system design, API design, testing strategy, code review, and safe refactoring. It is intentionally a routing and synthesis layer. Load only the referenced leaf document needed for the specific subdomain instead of expanding every topic by default.
-
-## Purpose
-- Provide one high-signal activation surface for a related engineering domain.
-- Keep token usage low by using this pack as the default context and loading `references/*.md` only when the task requires deeper guidance.
-- Preserve principal-level enterprise guidance from the previous leaf skills without keeping 33 peer skills in the Copilot skill namespace.
-
 ## When to Use
-- Ambiguous scope, business rules, actors, acceptance criteria, or measurable outcomes.
-- Architecture shape, service boundaries, sync/async decisions, ownership, or delivery complexity.
-- API contracts, idempotency, pagination, validation, versioning, or integration usability.
-- Risk-based test strategy, contract/E2E scope, or safe refactoring/review order.
+- Ambiguous scope, business rules, actors, acceptance criteria, NFRs, or measurable outcomes.
+- Architecture shape, service boundaries, sync/async decisions, ownership, deployment boundaries.
+- API contracts (REST/GraphQL/gRPC/async), idempotency, pagination, validation, versioning.
+- Risk-based test strategy, contract/E2E scope, fault-injection scope.
+- Code review severity, safe refactoring sequence, compatibility checks.
+
+## When NOT to Use
+- Concrete framework code (handlers, hooks, components, JPA mappings) → `application-stacks-pack`.
+- Database schema or query optimization → `data-database-analytics-pack`.
+- Messaging/eventing/gateway/workflow design → `platform-integration-pack`.
+- Telemetry, SLOs, runbooks, CI/CD design → `observability-release-pack`.
 
 ## Pack Reference Map
-- `references/requirements-analysis.md` — `requirements-analysis`
-- `references/solution-architecture.md` — `solution-architecture`
-- `references/system-design.md` — `system-design`
-- `references/api-design.md` — `api-design`
-- `references/testing-strategy.md` — `testing-strategy`
-- `references/code-review-and-refactoring.md` — `code-review-and-refactoring`
-
-## Routing Rules
-- Start with this pack's summary guidance for broad or ambiguous requests.
-- Read a reference file only when its subdomain affects the recommendation, implementation, review, or validation plan.
-- If more than three references appear necessary, state the primary reference first and summarize why each additional reference is required.
-- For cross-domain work, combine this pack with the adjacent pack named by `ce7-software-engineering.agent.md` instead of copying unrelated guidance here.
-
-## Reference Selection Matrix
-| Reference | Selection rule |
+| Reference | Use when |
 |---|---|
-| `requirements-analysis` | Read `references/requirements-analysis.md` when this exact subdomain is material to the answer. |
-| `solution-architecture` | Read `references/solution-architecture.md` when this exact subdomain is material to the answer. |
-| `system-design` | Read `references/system-design.md` when this exact subdomain is material to the answer. |
-| `api-design` | Read `references/api-design.md` when this exact subdomain is material to the answer. |
-| `testing-strategy` | Read `references/testing-strategy.md` when this exact subdomain is material to the answer. |
-| `code-review-and-refactoring` | Read `references/code-review-and-refactoring.md` when this exact subdomain is material to the answer. |
+| `requirements-analysis` | Use when actors, business rules, acceptance criteria, NFRs, edge cases, or scope slicing are unclear; the team disagrees on the problem. |
+| `solution-architecture` | Use when CHOOSING boundaries, ownership, sync vs async, build vs buy, or producing an ADR. |
+| `system-design` | Use when describing runtime flow, failure modes, sequence/state diagrams, or component-level behavior of a SELECTED architecture. |
+| `api-design` | Use when defining a specific API contract (style, schema, idempotency, versioning, pagination, error model, deprecation). |
+| `testing-strategy` | Use when sizing the testing pyramid, picking test types, defining contract/E2E/migration/fault-injection scope, or test data strategy. |
+| `code-review-and-refactoring` | Use when reviewing a PR, ranking review severity, planning a multi-step refactor, or assessing compatibility risk. |
+| `architecture-decision-records` | Use when capturing or reviewing an architectural decision, its alternatives, trade-offs, and consequences in a durable, append-only ADR. |
+| `legacy-modernization` | Use when modernizing a legacy system: strangler fig, anti-corruption layer, dual-write migration, legacy DB integration, or phased cutover for core banking/insurance. |
 
-## Expected Output Style
-- Start with the decision or finding before the reasoning.
-- Name the reference documents consulted when the work is non-trivial.
-- Separate immediate action, design trade-offs, tests, operational checks, and follow-up work.
-- Keep the answer concrete: include contracts, schemas, rollout gates, checklists, or examples when they reduce ambiguity.
+## Cross-Pack Handoffs
+- → `data-database-analytics-pack` when the architecture/API materially changes the data model.
+- → `security-access-pack` when boundaries cross trust/tenant lines.
+- → `platform-integration-pack` for any sync↔async boundary or external partner contract.
+- → `observability-release-pack` for the rollout plan and validation checklist.
 
-## Token Efficiency Rules
-- Do not paste large portions of reference files into the response.
-- Prefer a short synthesized rule plus a pointer to the exact reference when more depth is needed.
-- Avoid activating unrelated packs just because their concerns are generally useful.
-- Treat the pack as metadata + routing; treat `references/` as progressive disclosure.
-
-## Quality Gates
-Before finalizing work using this pack, verify:
-- The selected references match the user's actual risk and task type.
-- Security, data correctness, observability, delivery, and failure behavior are covered when they materially affect production risk.
-- Recommendations are testable and include validation evidence.
-- Any rejected option includes the reason it was rejected.

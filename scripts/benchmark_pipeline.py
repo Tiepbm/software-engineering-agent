@@ -59,6 +59,7 @@ REFERENCES = [
     "database-reliability-and-operations",
     "data-engineering-and-pipelines",
     "analytics-and-warehouse-design",
+    "databricks-lakehouse",
     "security-review",
     "authn-authz-and-secrets",
     "messaging-and-eventing",

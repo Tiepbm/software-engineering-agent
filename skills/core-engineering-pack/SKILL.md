@@ -27,6 +27,7 @@ description: 'Use when clarifying requirements, shaping solution architecture, d
 | `testing-strategy` | Use when sizing the testing pyramid, picking test types, defining contract/E2E/migration/fault-injection scope, or test data strategy. |
 | `code-review-and-refactoring` | Use when reviewing a PR, ranking review severity, planning a multi-step refactor, or assessing compatibility risk. |
 | `architecture-decision-records` | Use when capturing or reviewing an architectural decision, its alternatives, trade-offs, and consequences in a durable, append-only ADR. |
+| `legacy-modernization` | Use when modernizing a legacy system: strangler fig, anti-corruption layer, dual-write migration, legacy DB integration, or phased cutover for core banking/insurance. |
 
 ## Cross-Pack Handoffs
 - → `data-database-analytics-pack` when the architecture/API materially changes the data model.
