@@ -1,5 +1,29 @@
 # Changelog
 
+## [1.x] - 2026-05-01 - Pair-with-Coding alignment
+
+### Added
+
+- **`HANDOFF-PROTOCOL.md`** at repo root — canonical contract with the `coding-assistant-agent`. Mirrored byte-for-byte; CE7 is the canonical owner. Covers boundary table, Implementation Input Package, Implementation Return Package, re-engagement triggers.
+- **`Clarify-First Protocol`** in `agents/ce7-software-engineering.agent.md` — 6 lenses (data lifecycle, regulator/compliance, SLO/capacity, tenant model, rollout window, on-call ownership); cap of 3-5 questions.
+- **`Self-Critique Pass`** in the agent — reversibility / rejected-alternatives / open-questions check before finalizing any non-trivial answer; auto-runs Production Bar check for `production-critical` risk class.
+- **`Handoff to Coding Assistant`** section in the agent — names the Implementation Input Package fields (ADR id, contract snippet, idempotency-key shape, SLO numbers, rollout plan, runbook stub, on-call owner).
+- **`evals/handoff-to-coding.jsonl`** — 3 cases that exercise CE7's handoff discipline (must produce a complete Implementation Input Package, not just an ADR).
+- **`examples/handoff-to-coding-payment.md`** — worked example of the handoff (paired with `coding-assistant-agent/examples/expert-payment-idempotency.md`).
+
+### Changed
+
+- **`application-stacks-pack`** scope re-shrunk to **stack-level decision lens only** (framework choice, version/AOT/RSC/virtual-thread/Modulith trade-offs). Implementation handed off to `coding-assistant-agent` via `HANDOFF-PROTOCOL.md`. Scope-note prepended to all 5 references; pre-existing implementation snippets retained for trade-off context only.
+- Agent `Skill Routing` table row for `application-stacks-pack` updated to reflect the new scope.
+
+### Migration Notes
+
+- `HANDOFF-PROTOCOL.md` is required at repo root.
+- The `application-stacks-pack` references will not gain new implementation patterns; new implementation guidance lands in `coding-assistant-agent` instead.
+- `validate_hybrid_packs.py` continues to pass with no changes.
+
+---
+
 ## 2026-05-01 — Docs reorg, bilingual policy, AWS reference relocation
 
 ### Changed (BREAKING for AWS reference path)

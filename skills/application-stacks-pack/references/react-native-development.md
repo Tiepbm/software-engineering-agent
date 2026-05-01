@@ -2,6 +2,8 @@
 name: react-native-development
 description: 'Guides React Native delivery across screen architecture, navigation, Android and iOS differences, native modules, permissions, network state, offline behavior, performance, and production debugging.'
 ---
+> **SCOPE NOTE (v1.x):** This reference is now a **stack-level decision matrix** (versions, AOT/RSC/virtual-thread, Modulith, Expo-vs-bare, RxJS-vs-signals trade-offs). For *implementation* (writing handlers, components, hooks, queries, tests, migrations), hand off to **`coding-assistant-agent`** per `HANDOFF-PROTOCOL.md`. Pre-existing implementation snippets below are kept only as reference for the trade-off discussion — they are not the canonical place to copy code from.
+
 
 # React Native Development
 

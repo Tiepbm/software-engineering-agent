@@ -2,6 +2,8 @@
 name: dotnet-development
 description: 'Guides ASP.NET Core development with layered architecture, dependency injection, middleware, EF Core, validation, async, cancellation, DTOs, exceptions, logging, and tests.'
 ---
+> **SCOPE NOTE (v1.x):** This reference is now a **stack-level decision matrix** (versions, AOT/RSC/virtual-thread, Modulith, Expo-vs-bare, RxJS-vs-signals trade-offs). For *implementation* (writing handlers, components, hooks, queries, tests, migrations), hand off to **`coding-assistant-agent`** per `HANDOFF-PROTOCOL.md`. Pre-existing implementation snippets below are kept only as reference for the trade-off discussion — they are not the canonical place to copy code from.
+
 
 # Dotnet Development
 
