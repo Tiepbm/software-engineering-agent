@@ -64,6 +64,7 @@ Default to ONE pack. Activate a second pack only when the task crosses a domain 
 | Production readiness | Owner per page, game-day tested, support/repair documented | No on-call owner / no readiness review | `observability-release-pack/observability-and-sre` |
 | CI/CD / rollout | Tested rollback, expand-contract, SLO gates, signed artifacts | Untested rollback / coupled schema-and-code | `observability-release-pack/devops-and-release` |
 | Latency / throughput | Profile before optimize, queueing math, bounded concurrency | "Add cache to fix latency" without profiling | `resilience-performance-pack/performance-engineering` |
+| Cloud / AWS architecture | Workload-fit service selection, multi-AZ/region or DR rationale, Well-Architected pillars, IAM/VPC scoping, cost guardrails | Service picked by familiarity, single-AZ for production, IAM wildcard, no cost ceiling | `core-engineering-pack/aws-cloud-architecture` |
 
 If the **Stop if missing** condition is true on a production-critical path, ask for the missing constraint or refuse to give a confident production recommendation.
 

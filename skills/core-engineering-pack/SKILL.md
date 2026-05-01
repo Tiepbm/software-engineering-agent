@@ -28,6 +28,7 @@ description: 'Use when clarifying requirements, shaping solution architecture, d
 | `code-review-and-refactoring` | Use when reviewing a PR, ranking review severity, planning a multi-step refactor, or assessing compatibility risk. |
 | `architecture-decision-records` | Use when capturing or reviewing an architectural decision, its alternatives, trade-offs, and consequences in a durable, append-only ADR. |
 | `legacy-modernization` | Use when modernizing a legacy system: strangler fig, anti-corruption layer, dual-write migration, legacy DB integration, or phased cutover for core banking/insurance. |
+| `aws-cloud-architecture` | Use when selecting AWS services (compute/data/messaging/storage), designing multi-AZ/region or DR topology, applying Well-Architected pillars, planning IAM/VPC/network, or optimizing AWS cost. |
 
 ## Cross-Pack Handoffs
 - → `data-database-analytics-pack` when the architecture/API materially changes the data model.

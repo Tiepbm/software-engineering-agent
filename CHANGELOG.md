@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-05-01 — Docs reorg, bilingual policy, AWS reference relocation
+
+### Changed (BREAKING for AWS reference path)
+- **Moved `aws-cloud-architecture` reference** from `observability-release-pack/references/` → `core-engineering-pack/references/`. Its content is cloud architecture (compute/data/messaging/storage selection, multi-AZ/region, IAM/VPC, Well-Architected, cost) — that is solution architecture, not observability/release. `core-engineering-pack` now owns it (Option A from the review plan). Mirror in `.github/skills/` synced.
+- **Updated `scripts/validate_hybrid_packs.py`** EXPECTED map: `aws-cloud-architecture` moved from `observability-release-pack` to `core-engineering-pack`. Reference total stays at 39 in the validator's count helper but the human-facing count is now reported as **39 leaf references** (count unchanged: `aws-cloud-architecture` was simply relocated, not added; previous READMEs reported a stale "36" / "37").
+- **Rewrote `README.vi-VN.md`** as a true 80-line mirror of `README.md` (was 365 lines and 4 months stale: still listed 7 packs, 33 refs, `storage-search-stack-pack`, no `application-stacks-pack`, no AWS ref). Install detail moved to `docs/INSTALL.vi-VN.md`.
+- **Updated `agents/ce7-software-engineering.agent.md`**: added Tie-Break rule for AWS service selection; added `Cloud / AWS architecture` row to the Production Bar; sync to `.github/agents/`.
+- **Updated pack `SKILL.md`**: `core-engineering-pack` adds `aws-cloud-architecture` row to Pack Reference Map; `observability-release-pack` adds Cross-Pack Handoff line pointing back to it.
+- **Updated `README.md`** documentation map to reference paired bilingual docs and link to the new `docs/README.md` audience index. Bumped reference count and listed both agents (router + skill-evaluator) explicitly so the role of `agents/*.agent.md` is unambiguous.
+- **Updated `docs/GETTING-STARTED.md` and `.vi-VN.md`**: fixed stale "7 packs / `storage-search-stack-pack`" copy to current 8-pack layout including `application-stacks-pack` and the AWS reference under core.
+
+### Added
+- `docs/README.md` + `docs/README.vi-VN.md` — audience-grouped index of the docs folder (User / Evaluator / Maintainer) with the bilingual policy summary.
+- `docs/INSTALL.vi-VN.md` — Vietnamese counterpart of `docs/INSTALL.md` (user-facing → bilingual rule).
+- `AGENTS.md` `## Bilingual policy` section — explicit two-tier rule (bilingual user-facing/evaluator vs EN-only maintainer/runtime) so future contributors do not re-introduce stale Vietnamese mirrors.
+
+### Moved
+- `docs/PLAN-automatic-memory.md` → `reports/PLAN-automatic-memory.md`. Deferred/proposed work belongs alongside the brutal-review report, not in the user-facing `docs/` folder.
+
+### Notes for the maintainer
+- `.github/skills/` mirror is partially synced: AWS reference move and updated `core-engineering-pack`/`observability-release-pack` `SKILL.md` are mirrored; pre-existing missing references (`architecture-decision-records`, `incident-response-and-postmortem`, `cost-and-finops`) remain unsynced per the prior split-of-responsibility rule. Run `CHECK_GITHUB_MIRROR=1 python3 scripts/validate_hybrid_packs.py` to see the full delta.
+- `evals/routing-benchmark.jsonl` not changed in this PR; consider adding a `core-engineering-pack/aws-cloud-architecture` routing case in a follow-up so the AWS path has explicit benchmark coverage.
+- `agents/ce7-software-engineering.agent.md` is now ~125 lines (was ~123). Still under the 150-line budget.
+
 ## 2026-04-28 — Caveman-inspired output optimization (P1-P4)
 
 ### Added

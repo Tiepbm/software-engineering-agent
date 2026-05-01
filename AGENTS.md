@@ -8,7 +8,7 @@ A Copilot-first principal-engineering agent package:
 
 - **1 router agent** — `agents/ce7-software-engineering.agent.md`. Trim, table-driven, no knowledge dump.
 - **8 pack skills** — `skills/<pack>/SKILL.md`. Each one routes to its own deep references.
-- **36 references** — `skills/<pack>/references/*.md`. Progressive disclosure; loaded on demand.
+- **39 references** — `skills/<pack>/references/*.md`. Progressive disclosure; loaded on demand.
 - **3 examples** — `examples/`. Output shapes for architecture / debugging / review tasks.
 - **2 maintenance instruction files** — `instructions/principal-{agent,skills}-maintenance.instructions.md`.
 - **1 shared pack-conventions file** — `instructions/pack-conventions.instructions.md` (single source of truth for pack output style / token rules / quality gates).
@@ -100,6 +100,15 @@ CHECK_GITHUB_MIRROR=1 python3 scripts/validate_hybrid_packs.py
 | Add a tie-break rule | edit agent `Tie-Break Rules` (one line) + add a `boundary-*` case to `routing-benchmark.jsonl` |
 | Add a "must not do" pattern | edit one or more pack `When NOT to Use` + add an `anti-*` case to `anti-pattern-benchmark.jsonl` |
 | Trim something bloated | the validator caps pack `SKILL.md` at 100 lines; references warn at 220, fail at 250 |
+
+## Bilingual policy
+
+Two tiers, enforced by review (not by the validator yet):
+
+- **Bilingual (`.md` + `.vi-VN.md`)** — user-facing docs and evaluator artifacts paired with execution scripts: `README`, `docs/README`, `docs/GETTING-STARTED`, `docs/INSTALL`, `docs/pipeline-guide`, `docs/evaluation-improvement-playbook`, `evals/scoring-rubric`, `evals/file-based-benchmark-pipeline`, `evals/model-comparison-runbook`, `evals/manual-evaluation-template`, `reports/README`, `reports/latest-skill-eval`.
+- **EN-only** — maintainer-only docs that drive CI rules or technical research and would suffer from translation drift: `docs/skill-pack-quality-rubric.md`, `docs/external-skill-research.md`, `instructions/*.instructions.md`, `agents/*.agent.md`, `examples/*`, `reports/CE7-AGENT-SYSTEM-REVIEW-*.md`, `reports/PLAN-*.md`, `CHANGELOG.md`, `REVIEW.md`, this file.
+
+When in doubt: if the doc is read by a runtime consumer (Copilot, validator, pipeline script) or describes pack/agent internals, keep it EN-only. If it is a human entry point or paired with a script the user runs, keep it bilingual.
 
 ## What NOT to do
 

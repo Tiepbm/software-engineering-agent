@@ -48,7 +48,6 @@ EXPECTED = {
         "observability-and-sre",
         "devops-and-release",
         "incident-response-and-postmortem",
-        "aws-cloud-architecture",
     ],
     "storage-search-pack": [
         "file-and-object-storage",

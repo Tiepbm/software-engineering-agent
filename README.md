@@ -76,7 +76,7 @@ Add `CHECK_GITHUB_MIRROR=1` to also validate the `.github/` mirror.
 
 ## Status
 
-- Layout: 8 packs / 36 references / 1 router agent / 3 examples / 4 eval files.
+- Layout: 8 packs / 39 references / 2 agents / 3 examples / 4 eval files.
 - Last review: `reports/CE7-AGENT-SYSTEM-REVIEW-2026-04-28.md`.
 
 ## Contributing

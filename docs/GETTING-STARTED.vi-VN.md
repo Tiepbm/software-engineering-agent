@@ -37,13 +37,14 @@ Prompt của bạn
 
 | Pack | Bao phủ |
 |---|---|
-| `core-engineering-pack` | Requirements, architecture, APIs, testing, code review |
+| `core-engineering-pack` | Requirements, architecture, APIs, testing, code review, AWS cloud architecture |
 | `data-database-analytics-pack` | Data models, databases, SQL, pipelines, analytics |
 | `security-access-pack` | Security review, auth, secrets, tenant isolation |
 | `platform-integration-pack` | Messaging, gateways, rate limits, workflows, jobs |
-| `resilience-performance-pack` | Resilience, caching, performance engineering |
-| `observability-release-pack` | Telemetry, SLOs, CI/CD, rollout, rollback |
-| `storage-search-stack-pack` | Object storage, search, .NET, Spring Boot, React, Angular, React Native |
+| `resilience-performance-pack` | Resilience, caching, performance, cost/FinOps |
+| `observability-release-pack` | Telemetry, SLOs, CI/CD, rollout, rollback, incident response |
+| `storage-search-pack` | Object storage, signed URLs, search/indexing |
+| `application-stacks-pack` | .NET, Spring Boot, React, Angular, React Native |
 
 ## Thứ tự đọc tài liệu
 

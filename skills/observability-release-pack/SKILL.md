@@ -26,6 +26,7 @@ This pack carries TWO orthogonal axes — **telemetry/SRE** (vertical) and **rel
 | `incident-response-and-postmortem` | Use when designing on-call response, severity classification, comms protocol, blameless postmortem, action-item tracking, or learning loops for production incidents. |
 
 ## Cross-Pack Handoffs
+- → `core-engineering-pack` for cloud architecture / AWS service selection / Well-Architected reviews (`aws-cloud-architecture`).
 - → `data-database-analytics-pack` for migration sequencing and restore drills.
 - → `platform-integration-pack` for DLQ/lag dashboards and consumer-repair runbooks.
 - → `resilience-performance-pack` for SLO-driven degradation and capacity gates.

@@ -1,57 +1,34 @@
 ---
 name: observability-release-pack
-description: 'Use when designing logs, metrics, traces, SLIs, SLOs, dashboards, alerts, runbooks, production readiness, CI/CD, rollout, feature flags, rollback, or migration release safety.'
+description: 'Use when designing logs/metrics/traces, SLIs/SLOs, dashboards, alerts, runbooks, production readiness, CI/CD, rollouts, feature flags, rollback, or migration release safety.'
 ---
 # Observability and Release Pack
 
-## Description
-This is a Copilot-first hybrid pack skill for logging, metrics, tracing, SLOs, alerting, SRE readiness, CI/CD, deployment, release, and rollback safety. It is intentionally a routing and synthesis layer. Load only the referenced leaf document needed for the specific subdomain instead of expanding every topic by default.
-
-## Purpose
-- Provide one high-signal activation surface for a related engineering domain.
-- Keep token usage low by using this pack as the default context and loading `references/*.md` only when the task requires deeper guidance.
-- Preserve principal-level enterprise guidance from the previous leaf skills without keeping 33 peer skills in the Copilot skill namespace.
+This pack carries TWO orthogonal axes — **telemetry/SRE** (vertical) and **release/delivery** (horizontal). Pick references along the axis the prompt is on.
 
 ## When to Use
-- Structured logs, metrics, traces, correlation IDs, redaction, telemetry cardinality, or trace propagation.
-- SLIs, SLOs, burn-rate alerts, dashboards, severity, ownership, runbooks, incident readiness, or game days.
-- CI/CD, environment promotion, config, secrets in pipelines, feature flags, canary/blue-green, migration sequencing, rollback, or release gates.
+- Structured logs, metrics, traces, correlation IDs, redaction, telemetry cardinality, trace propagation.
+- SLIs, SLOs, burn-rate alerts, dashboards, severity, ownership, runbooks, on-call readiness, game days.
+- CI/CD, environment promotion, secrets in pipelines, feature flags, canary/blue-green/progressive delivery, migration sequencing, rollback, SLO-gated rollout.
+
+## When NOT to Use
+- DB-specific migration mechanics (expand-contract DDL, restore drill) → `data-database-analytics-pack` → `database-reliability-and-operations`.
+- Identity/secret design itself → `security-access-pack` → `authn-authz-and-secrets`.
+- Resilience PATTERNS (timeouts, circuit breaker) → `resilience-performance-pack`.
 
 ## Pack Reference Map
-- `references/logging-metrics-and-tracing.md` — `logging-metrics-and-tracing`
-- `references/monitoring-alerting-and-slos.md` — `monitoring-alerting-and-slos`
-- `references/observability-and-sre.md` — `observability-and-sre`
-- `references/devops-and-release.md` — `devops-and-release`
-
-## Routing Rules
-- Start with this pack's summary guidance for broad or ambiguous requests.
-- Read a reference file only when its subdomain affects the recommendation, implementation, review, or validation plan.
-- If more than three references appear necessary, state the primary reference first and summarize why each additional reference is required.
-- For cross-domain work, combine this pack with the adjacent pack named by `ce7-software-engineering.agent.md` instead of copying unrelated guidance here.
-
-## Reference Selection Matrix
-| Reference | Selection rule |
+| Reference | Use when |
 |---|---|
-| `logging-metrics-and-tracing` | Read `references/logging-metrics-and-tracing.md` when this exact subdomain is material to the answer. |
-| `monitoring-alerting-and-slos` | Read `references/monitoring-alerting-and-slos.md` when this exact subdomain is material to the answer. |
-| `observability-and-sre` | Read `references/observability-and-sre.md` when this exact subdomain is material to the answer. |
-| `devops-and-release` | Read `references/devops-and-release.md` when this exact subdomain is material to the answer. |
+| `logging-metrics-and-tracing` | Use when defining structured log fields, metric names/cardinality, trace span model, redaction rules, or correlation-ID propagation. |
+| `monitoring-alerting-and-slos` | Use when defining SLIs/SLOs, burn-rate alerts, severity, ownership, runbook links, or alert routing. |
+| `observability-and-sre` | Use when planning production readiness, on-call ownership, game day, or end-to-end observability story across owners. Delegates detail to the two siblings above. |
+| `devops-and-release` | Use when designing CI/CD stages, deployment topology (rolling/blue-green/canary/progressive), feature flags, GitOps, signing, rollout gates, or rollback drills. |
+| `incident-response-and-postmortem` | Use when designing on-call response, severity classification, comms protocol, blameless postmortem, action-item tracking, or learning loops for production incidents. |
 
-## Expected Output Style
-- Start with the decision or finding before the reasoning.
-- Name the reference documents consulted when the work is non-trivial.
-- Separate immediate action, design trade-offs, tests, operational checks, and follow-up work.
-- Keep the answer concrete: include contracts, schemas, rollout gates, checklists, or examples when they reduce ambiguity.
+## Cross-Pack Handoffs
+- → `core-engineering-pack` for cloud architecture / AWS service selection / Well-Architected reviews (`aws-cloud-architecture`).
+- → `data-database-analytics-pack` for migration sequencing and restore drills.
+- → `platform-integration-pack` for DLQ/lag dashboards and consumer-repair runbooks.
+- → `resilience-performance-pack` for SLO-driven degradation and capacity gates.
+- → `security-access-pack` for sensitive-log masking, audit events, and secret rotation in pipelines.
 
-## Token Efficiency Rules
-- Do not paste large portions of reference files into the response.
-- Prefer a short synthesized rule plus a pointer to the exact reference when more depth is needed.
-- Avoid activating unrelated packs just because their concerns are generally useful.
-- Treat the pack as metadata + routing; treat `references/` as progressive disclosure.
-
-## Quality Gates
-Before finalizing work using this pack, verify:
-- The selected references match the user's actual risk and task type.
-- Security, data correctness, observability, delivery, and failure behavior are covered when they materially affect production risk.
-- Recommendations are testable and include validation evidence.
-- Any rejected option includes the reason it was rejected.
