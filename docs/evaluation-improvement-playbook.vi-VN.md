@@ -14,7 +14,7 @@
 
 CE7 hiện dùng kiến trúc **Copilot-first hybrid packs**:
 
-- Copilot thấy **7 pack skills** ở `.github/skills/*/SKILL.md`.
+- Copilot thấy **8 pack skills** ở `.github/skills/*/SKILL.md`.
 - 33 leaf skills cũ nằm trong `references/*.md`.
 - Agent chính `ce7-software-engineering` route theo pack trước, reference sau.
 - `skill-evaluator` đánh giá trigger, routing, overlap, token efficiency, output quality và originality.

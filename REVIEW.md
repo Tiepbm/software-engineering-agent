@@ -4,7 +4,7 @@
 **Scope**: Copilot-first hybrid package with 2 agents + 8 pack skills + 36 references + eval harness.  
 **Status**: Post Claude 4.7 review + P0 refactor + caveman-inspired output optimization.
 
-> Migration note: the previous 33 peer skills are no longer peers. They are preserved as `references/*.md` under 7 pack skills and mirrored into `.github/skills/` for GitHub Copilot. Use `python3 scripts/validate_hybrid_packs.py` as the current structural quality gate.
+> Migration note: the previous 33 peer skills are no longer peers. They are preserved as `references/*.md` under 8 pack skills and mirrored into `.github/skills/` for GitHub Copilot. Use `python3 scripts/validate_hybrid_packs.py` as the current structural quality gate.
 
 This report replaces the older pre-patch review. The previous findings about thin stack skills, missing few-shot examples, and observability overlap have been rechecked against the current package.
 
@@ -14,9 +14,9 @@ This report replaces the older pre-patch review. The previous findings about thi
 
 | Category | Result |
 |---|---|
-| Package contents | 2 agents, 7 pack skills, 33 references, 2 instruction files, Copilot `.github/` target, eval harness |
-| Pack frontmatter compliance | ✅ 7/7 pack skills use trigger-first frontmatter |
-| Reference preservation | ✅ 33/33 former leaf skills preserved under pack `references/` |
+| Package contents | 2 agents, 8 pack skills, 39 references, 3 instruction files, Copilot `.github/` target, eval harness |
+| Pack frontmatter compliance | ✅ 8/8 pack skills use trigger-first frontmatter |
+| Reference preservation | ✅ 39/39 references preserved under pack `references/` |
 | Copilot target | ✅ `.github/copilot-instructions.md`, `.github/agents/`, and `.github/skills/` created |
 | Agent routing | ✅ Routes pack-first, then leaf references only when needed |
 | Agent few-shot example | ✅ Present: architecture-task example for payment idempotency |
@@ -124,7 +124,7 @@ Line counts were checked directly from the current files.
 - ✅ Clear principal-level identity: behaves like a panel of senior specialists, not a generic assistant.
 - ✅ Strong enterprise and regulated-system posture: data correctness, auditability, resource-level authorization, idempotency, migrations, observability, operational controls.
 - ✅ Mandatory request triage forces the agent to classify role, supporting lenses, task type, risk, sensitivity, and missing constraints.
-- ✅ Skill routing now covers all 7 packs and names leaf references only when precision is needed.
+- ✅ Skill routing now covers all 8 packs and names leaf references only when precision is needed.
 - ✅ `Cross-Cutting Platform Routing` now routes to specialist skills instead of repeating full platform guidance.
 - ✅ Few-shot example for payment idempotency gives a concrete output shape: decision, skills consulted, assumptions, contract, rejected alternatives, tests, operational signals, open questions.
 - ✅ Production stop conditions are explicit and useful for high-risk recommendations.

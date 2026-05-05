@@ -14,7 +14,7 @@
 
 CE7 uses a **Copilot-first hybrid pack** design:
 
-- GitHub Copilot sees **7 pack skills** under `.github/skills/*/SKILL.md`.
+- GitHub Copilot sees **8 pack skills** under `.github/skills/*/SKILL.md`.
 - The previous 33 leaf skills live under `references/*.md`.
 - `ce7-software-engineering` routes pack first, reference second.
 - `skill-evaluator` reviews triggers, routing, overlap, token efficiency, output quality, and originality.

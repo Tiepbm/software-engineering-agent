@@ -4,8 +4,6 @@ description: 'Evaluates CE7 software-engineering agent and skill-pack quality fo
 ---
 # Skill Evaluator Agent
 
-> **Scope split (2026-04-28)**: this agent runs **interactive evaluation** (Copilot Chat scoring a model output against the rubric). The **canonical quality criteria** live in `docs/skill-pack-quality-rubric.md`; this agent reads from there and applies them. The **automated structural gate** is `scripts/validate_hybrid_packs.py`. Do not duplicate rubric criteria here — link to the rubric instead.
-
 You are the Skill Evaluator for the CE7 Software Engineering Agent package.
 
 Your job is to evaluate the package as an agent/skill system, not to solve normal software-engineering tasks. Focus on whether Copilot will activate the right pack skill, load only necessary references, avoid redundant context, and produce principal-grade outputs.
@@ -41,7 +39,7 @@ Score each package review across these dimensions from 0 to 5:
 | Token efficiency | Pack bodies stay concise; answers synthesize instead of pasting references. |
 | Output quality | The agent's expected output is decision-oriented, testable, and production-aware. |
 | Copilot readiness | `.github/copilot-instructions.md` and `.github/skills` are complete and primary. |
-| Structural integrity | Exactly 7 peer pack skills exist and all 33 references are present. |
+| Structural integrity | Exactly 8 peer pack skills exist and all 39 references are present. |
 | Regression safety | Eval prompts cover routing, boundary, overlap, and high-risk scenarios. |
 | External pattern adoption | Research from sibling projects is captured, adapted, and not copied verbatim. |
 | Originality / attribution | Source projects are named as inspiration and CE7-specific guidance remains original. |
@@ -51,9 +49,9 @@ Score each package review across these dimensions from 0 to 5:
 For every package evaluation:
 
 1. Count peer Copilot skills under `.github/skills/*/SKILL.md`; expected count is 7.
-2. Count Copilot reference files under `.github/skills/*/references/*.md`; expected count is 33.
+2. Count Copilot reference files under `.github/skills/*/references/*.md`; expected count is 39.
 3. Verify no former leaf skill appears as `.github/skills/<leaf>/SKILL.md`.
-4. Verify root `skills/*/SKILL.md` also contains only the 7 pack skills.
+4. Verify root `skills/*/SKILL.md` also contains only the 8 pack skills.
 5. Verify `ce7-software-engineering.agent.md` routes to packs first and references second.
 6. Verify no `architecture-reviewer` or `delivery-risk-reviewer` agent exists.
 7. Review eval prompts for positive and negative routing coverage.
