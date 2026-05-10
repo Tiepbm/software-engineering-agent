@@ -7,6 +7,8 @@
 
 # testing
 /coverage
+__pycache__/
+*.py[cod]
 
 # production
 /build
@@ -26,6 +28,9 @@ yarn-error.log*
 # benchmark run outputs
 /runs/
 
-# GitHub Copilot mirror (generated from skills/)
+# Generated GitHub Copilot mirrors and runtime artifacts.
+# Canonical sources live in agents/, instructions/, skills/, hooks/, workflows/.
 .github/
+logs/copilot/
+.handoffs/
 

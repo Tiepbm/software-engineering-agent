@@ -4,7 +4,7 @@ This directory stores interaction history that the CE7 agent can reference to im
 
 ## How it works
 
-1. After each significant interaction, append a summary to `interaction-log.jsonl`
+1. After each significant interaction, append a privacy-safe summary to `interaction-log.jsonl` manually or via the optional `memory-save` hook
 2. Periodically (weekly), review the log and update `learned-patterns.md`
 3. The agent reads `learned-patterns.md` via instructions to improve future responses
 
@@ -51,3 +51,6 @@ This directory stores interaction history that the CE7 agent can reference to im
 The agent's instructions reference `memory/learned-patterns.md`. This file is kept short (< 50 lines) and contains only high-signal patterns that materially affect routing or output quality.
 
 The agent does NOT read `interaction-log.jsonl` directly during prompts (too large). Instead, patterns are synthesized into `learned-patterns.md` during periodic review.
+
+Runtime hook entries must remain privacy-safe metadata only: file paths, likely packs/references, active ADR id, handoff status, and coarse quality labels. Do not store prompt bodies, code contents, tool output bodies, secrets, or real customer data.
+
