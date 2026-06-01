@@ -21,7 +21,7 @@ A Copilot-first principal-engineering agent package:
 agents/                 ce7-software-engineering.agent.md  ← router; KEEP SHORT
                         skill-evaluator.agent.md           ← package self-evaluator
 skills/<pack>/SKILL.md  ← 8 packs; ≤ 100 lines each (CI-enforced)
-skills/<pack>/references/*.md  ← 36 deep playbooks
+skills/<pack>/references/*.md  ← 39 deep playbooks
 instructions/           pack-conventions.instructions.md         ← inherited by every pack
                         principal-agent-maintenance.instructions.md
                         principal-skills-maintenance.instructions.md

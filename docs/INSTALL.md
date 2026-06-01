@@ -12,7 +12,7 @@ cp agents/ce7-software-engineering.agent.md ~/.copilot/agents/
 cp instructions/*.instructions.md           ~/.copilot/instructions/
 cp .github/copilot-instructions.md          ~/.copilot/copilot-instructions.md
 
-# Skills (8 packs + 36 references)
+# Skills (8 packs + 39 references)
 rm -rf ~/.copilot/skills/*
 cp -R .github/skills/* ~/.copilot/skills/
 ```

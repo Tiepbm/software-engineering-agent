@@ -60,7 +60,6 @@ Xem [`docs/README.vi-VN.md`](docs/README.vi-VN.md) để có index nhóm theo đ
 | `evals/scoring-rubric.md` / `.vi-VN.md` | Evaluator | Rubric chấm điểm theo từng prompt. |
 | `examples/` | User / agent | Template output-shape mà agent tham chiếu. |
 | `reports/CE7-AGENT-SYSTEM-REVIEW-2026-04-28.md` | Maintainer | Review nghiêm khắc dẫn tới kiến trúc hiện tại. |
-| `reports/PLAN-automatic-memory.md` | Maintainer | Plan thiết kế deferred (memory dựa MCP). |
 | `CHANGELOG.md` | Tất cả | Release log. |
 
 ## Quality gate (CI-enforceable)

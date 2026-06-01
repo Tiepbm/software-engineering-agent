@@ -34,6 +34,6 @@ This folder is grouped by **audience**, not by document type. Pick the row that 
 
 - `../AGENTS.md` — contributor & maintainer entry point (editing rules, sync workflow, bilingual policy).
 - `../instructions/` — instruction files inherited by packs and the principal agent.
-- `../reports/` — run-level reports, history, and deferred design plans (e.g. `PLAN-automatic-memory.md`).
+- `../reports/` — run-level reports and history (e.g. `latest-skill-eval.md`, `skill-eval-history.jsonl`).
 - `../examples/` — output-shape templates referenced by the agent.
 

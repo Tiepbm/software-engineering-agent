@@ -34,6 +34,6 @@ Folder này được nhóm theo **đối tượng người đọc**, không theo
 
 - `../AGENTS.md` — entry point cho contributor & maintainer (quy tắc edit, sync workflow, bilingual policy).
 - `../instructions/` — file instruction được pack và principal agent kế thừa.
-- `../reports/` — report ở mức run, history, và plan thiết kế deferred (vd `PLAN-automatic-memory.md`).
+- `../reports/` — report ở mức run và history (vd `latest-skill-eval.md`, `skill-eval-history.jsonl`).
 - `../examples/` — template output-shape mà agent tham chiếu.
 

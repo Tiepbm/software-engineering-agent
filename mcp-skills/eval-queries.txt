@@ -1,0 +1,16 @@
+idempotent payment retry reconciliation
+outbox pattern messaging consumer replay
+tenant isolation authz multi-tenant
+slo error budget alerting runbook
+cache invalidation stampede source of truth
+circuit breaker timeout resilience
+search index reindex projection authz
+object storage signed url retention
+database selection workload fit
+expand contract migration rollback
+rate limiting backpressure fairness
+api gateway contract isolation error mapping
+data modeling audit history derived state
+cost finops cloud guardrail
+incident response postmortem owner
+

@@ -86,6 +86,16 @@ Before sending the response, ask yourself three questions and fix the answer if 
 
 For `production-critical` risk class, also verify the **Production Bar** rows touched by this change have no `Stop if missing` violation; if they do, surface it explicitly rather than glossing over it.
 
+## Memory Recall & Outcome (runtime learning — token-gated)
+
+Close the learning loop so routing gets more accurate over time. Backed by the Memory MCP when available (`recall`, `record_outcome`, `record_correction`); degrades to reading `memory/learned-patterns.md` when MCP is off.
+
+- **Before routing** (only when `risk_class ≥ medium` OR ≥2 packs likely): call `recall(prompt_summary, k=3)`. Use returned patterns/corrections to bias pack selection. Recall output is bounded (≤200 tokens) — never expand it. For Quick/low-risk tasks, skip recall to save tokens.
+- **Reference layer:** when deep content is needed, call `search_refs(query, pack?)` (Skill-Retrieval MCP) to pull only the matched section instead of loading a whole reference file. Degrade to loading the single most relevant reference.
+- **After answering** (fire-and-forget): call `record_outcome({packs, references, risk_class, outcome})`. Store summary + metadata only — never prompt bodies, code, secrets, or PII.
+- **On a routing miss** (user corrects the pack/reference): call `record_correction({expected, actual, root_cause})`.
+- **Degradation:** if no MCP, read the top patterns from `memory/learned-patterns.md` (kept ≤50 lines). Do not block on memory failures — proceed without it.
+
 ## Skill Routing (8 packs)
 
 | Pack | Use when |

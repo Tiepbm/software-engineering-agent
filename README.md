@@ -8,7 +8,7 @@ A **principal-level engineering agent** for enterprise and regulated systems (ba
 
 - **1 router agent** — `agents/ce7-software-engineering.agent.md` (~110 lines, table-driven).
 - **8 pack skills** — concrete `Use when` triggers, distinct `When NOT to Use` boundaries, explicit cross-pack handoffs.
-- **36 reference playbooks** — loaded only when a task needs them.
+- **39 reference playbooks** — loaded only when a task needs them.
 - **3 output-shape examples** — architecture, debugging, review.
 - **Eval harness** — routing, anti-pattern, token-budget, banking/insurance benchmarks + scoring rubric.
 - **Copilot-first deployment** via `.github/copilot-instructions.md` + `.github/skills/`.
@@ -48,6 +48,7 @@ python3 scripts/validate_hybrid_packs.py
 | `AGENTS.md` | Maintainer / contributor | Short editing rules and workflow. |
 | `docs/INSTALL.md` | User | Install modes and post-install checks. |
 | `docs/GETTING-STARTED.md` | User | 5-minute first-prompt walkthrough. |
+| `docs/mcp-usage.md` | User | Local MCP servers: memory learning, token-saving retrieval, grounding. |
 | `docs/pipeline-guide.md` | Evaluator | End-to-end benchmark execution. |
 | `docs/evaluation-improvement-playbook.md` | Maintainer | When and how to improve packs. |
 | `docs/skill-pack-quality-rubric.md` | Maintainer | Quality gates a PR must clear. |
@@ -65,7 +66,7 @@ python3 scripts/validate_hybrid_packs.py
 `python3 scripts/validate_hybrid_packs.py` enforces:
 
 - 8 peer pack skills (`skills/<pack>/SKILL.md`).
-- 36 leaf references (`skills/<pack>/references/*.md`).
+- 39 leaf references (`skills/<pack>/references/*.md`).
 - Pack frontmatter `description` starts with `'Use when'`.
 - Pack `SKILL.md` ≤ 100 lines.
 - Routing benchmark uses only known pack names.
